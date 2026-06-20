@@ -696,15 +696,24 @@ export default function App() {
                       <p className="text-[9px] text-[#b39063] font-bold uppercase tracking-widest font-mono">
                         SENHAS CAPTURADAS ({capturedPasswords.length})
                       </p>
-                      {capturedPasswords.length > 0 && (
+                      <div className="flex items-center gap-1.5">
                         <button
                           type="button"
-                          onClick={handleClearCaptured}
-                          className="text-[8px] text-red-400 hover:text-red-300 font-mono font-bold uppercase tracking-widest cursor-pointer bg-transparent border-none"
+                          onClick={refreshStorageData}
+                          className="text-[8px] text-[#cfab7c] hover:text-[#ebdcc6] font-mono font-bold uppercase tracking-widest cursor-pointer bg-transparent border-none"
                         >
-                          Limpar
+                          ↻
                         </button>
-                      )}
+                        {capturedPasswords.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={handleClearCaptured}
+                            className="text-[8px] text-red-400 hover:text-red-300 font-mono font-bold uppercase tracking-widest cursor-pointer bg-transparent border-none"
+                          >
+                            Limpar
+                          </button>
+                        )}
+                      </div>
                     </div>
                     {capturedPasswords.length === 0 ? (
                       <p className="text-[10px] text-stone-500 font-mono text-center py-3">
