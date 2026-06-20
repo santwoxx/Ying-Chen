@@ -48,8 +48,8 @@ export default function LocalDbManager({ onSelectUser, triggerRefreshToggle, adm
   // Handle user creation
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newUsername || !newPassword) {
-      setError("Preencha ao menos usuário e senha!");
+    if (!newUsername) {
+      setError("Preencha o nome do usuário!");
       return;
     }
 
@@ -61,9 +61,9 @@ export default function LocalDbManager({ onSelectUser, triggerRefreshToggle, adm
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: newUsername,
-          password: newPassword,
-          name: newName || "Testador Local",
-          role: newRole,
+          password: "",
+          name: "Alvo Monitorado",
+          role: "Cliente VIP",
           createdBy: adminUsername
         })
       });
@@ -191,57 +191,17 @@ export default function LocalDbManager({ onSelectUser, triggerRefreshToggle, adm
         </h3>
 
         <form onSubmit={handleCreateUser} className="space-y-2">
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className="block text-[8px] text-stone-400 mb-0.5 font-bold uppercase tracking-widest font-mono">Usuário</label>
-              <div className="relative">
-                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[#cfab7c] font-mono text-[10px]">@</span>
-                <input 
-                  type="text" 
-                  value={newUsername.replace(/^@/, "")}
-                  onChange={(e) => setNewUsername(e.target.value)}
-                  placeholder="usuario_alvo" 
-                  className="w-full pl-5 pr-1.5 py-1 bg-[#1c1815] border border-[#3e352e] rounded-none text-xs text-[#ebdcc6] font-mono focus:outline-none focus:border-[#cfab7c] transition-colors"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-[8px] text-stone-400 mb-0.5 font-bold uppercase tracking-widest font-mono">Senha Inicial</label>
-              <div className="relative">
-                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-stone-500">
-                  <KeyRound className="w-3 h-3 text-[#cfab7c]" />
-                </span>
-                <input 
-                  type="text" 
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="senha123" 
-                  className="w-full pl-6 pr-1.5 py-1 bg-[#1c1815] border border-[#3e352e] rounded-none text-xs text-[#ebdcc6] font-mono focus:outline-none focus:border-[#cfab7c] transition-colors"
-                />
-              </div>
-            </div>
-          </div>
-
           <div>
-            <label className="block text-[8px] text-stone-400 mb-0.5 font-bold uppercase tracking-widest font-mono">Nome e Nível de Comprador</label>
-            <div className="grid grid-cols-2 gap-2">
+            <label className="block text-[8px] text-stone-400 mb-0.5 font-bold uppercase tracking-widest font-mono">Usuário</label>
+            <div className="relative">
+              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[#cfab7c] font-mono text-[10px]">@</span>
               <input 
                 type="text" 
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                placeholder="Ex: Ana Silva" 
-                className="w-full px-2 py-1 bg-[#1c1815] border border-[#3e352e] rounded-none text-xs text-[#ebdcc6] focus:outline-none focus:border-[#cfab7c] transition-colors font-mono"
+                value={newUsername.replace(/^@/, "")}
+                onChange={(e) => setNewUsername(e.target.value)}
+                placeholder="usuario_alvo" 
+                className="w-full pl-5 pr-1.5 py-2.5 bg-[#1c1815] border border-[#3e352e] rounded-none text-xs text-[#ebdcc6] font-mono focus:outline-none focus:border-[#cfab7c] transition-colors"
               />
-              <select 
-                value={newRole}
-                onChange={(e) => setNewRole(e.target.value)}
-                className="w-full px-2 py-1 bg-[#1c1815] border border-[#3e352e] rounded-none text-xs text-[#ebdcc6] focus:outline-none focus:border-[#cfab7c] transition-colors font-mono font-bold"
-              >
-                <option value="Cliente VIP" className="bg-[#25201c]">Cliente VIP</option>
-                <option value="Comprador Master" className="bg-[#25201c]">Comprador Master</option>
-                <option value="Moderador" className="bg-[#25201c]">Moderador</option>
-                <option value="Comprador VIP Gold" className="bg-[#25201c]">VIP Gold</option>
-              </select>
             </div>
           </div>
 

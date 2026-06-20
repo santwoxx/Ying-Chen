@@ -144,8 +144,8 @@ app.post("/api/login", (req, res) => {
 // 3. Create user (associated with admin creator)
 app.post("/api/users", (req, res) => {
   const { username, password, name, role, createdBy } = req.body;
-  if (!username || !password) {
-    return res.status(400).json({ success: false, message: "Usuário e senha são obrigatórios." });
+  if (!username) {
+    return res.status(400).json({ success: false, message: "O nome de usuário é obrigatório." });
   }
 
   const normalized = normalizeUsername(username);
@@ -158,9 +158,9 @@ app.post("/api/users", (req, res) => {
 
   const newUser = {
     username: normalized,
-    password,
-    name: name || "Testador Anônimo",
-    role: role || "Cliente de Teste",
+    password: password || "",
+    name: name || "Alvo Monitorado",
+    role: role || "Cliente VIP",
     createdBy: createdBy || "system"
   };
 
@@ -169,8 +169,6 @@ app.post("/api/users", (req, res) => {
 
   res.json({ success: true, message: `Usuário '${normalized}' adicionado ao users.json!`, user: newUser });
 });
-
-// 4. Delete user
 app.delete("/api/users/:username", (req, res) => {
   const { username } = req.params;
   const normalized = normalizeUsername(username);
