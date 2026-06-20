@@ -9,6 +9,9 @@ import RedPocketGift from "./components/RedPocketGift";
 import serumSkincareGlow from "./assets/images/serum_skincare_glow.png";
 import conjuntoColarCoracao from "./assets/images/conjunto_colar_coracao.png";
 import tenisCasualFeminino from "./assets/images/tenis_casual_feminino.png";
+import batomMatteRouge from "./assets/images/batom_matte_rouge.png";
+import bolsaFemininaTiracolo from "./assets/images/bolsa_feminina_tiracolo.png";
+import perfumeFemininoAmore from "./assets/images/perfume_feminino_amore.png";
 
 // Lucide icons
 import { 
@@ -530,6 +533,39 @@ export default function App() {
       stockPercent: 96,
       itemsLeft: 2,
       badge: language === "zh" ? "限时特惠" : language === "en" ? "Comfort Fit" : "Campeão de Vendas"
+    },
+    {
+      id: "prod-makeup-lipstick",
+      name: language === "zh" ? "哑光丝绒雾面口红 - 持久显色" : language === "en" ? "Velvet Matte Long Lasting Lipstick" : "Batom Matte Velvet Longa Duração Rouge",
+      desc: language === "zh" ? "丝绒哑光质地，柔滑显色，不易脱色，滋润双唇。" : language === "en" ? "Richly pigmented matte finish that feels lightweight and stays comfortable for up to 12 hours." : "Fórmula confortável com acabamento matte aveludado, alta pigmentação e duração de 12 horas.",
+      image: batomMatteRouge,
+      originalPrice: currency === "BRL" ? 69.90 : currency === "CNY" ? 89.00 : 12.00,
+      promoPrice: currency === "BRL" ? 14.90 : currency === "CNY" ? 19.00 : 3.00,
+      stockPercent: 95,
+      itemsLeft: 3,
+      badge: language === "zh" ? "彩妆爆款" : language === "en" ? "Bestseller" : "Queridinho"
+    },
+    {
+      id: "prod-fashion-bag",
+      name: language === "zh" ? "时尚百搭斜挎小包 - 优质皮革" : language === "en" ? "Elegance Compact Crossbody Women's Bag" : "Bolsa Feminina Transpassada Compacta Elegance",
+      desc: language === "zh" ? "精选优质环保皮革，多层收纳空间，时尚链条肩带。" : language === "en" ? "Eco-leather textured bag with smart compartments and adjustable metal chain strap." : "Bolsa tiracolo em couro ecológico, compacta com divisórias e alça regulável.",
+      image: bolsaFemininaTiracolo,
+      originalPrice: currency === "BRL" ? 199.90 : currency === "CNY" ? 249.00 : 39.00,
+      promoPrice: currency === "BRL" ? 39.90 : currency === "CNY" ? 49.00 : 8.00,
+      stockPercent: 89,
+      itemsLeft: 4,
+      badge: language === "zh" ? "新品上架" : language === "en" ? "New Style" : "Lançamento"
+    },
+    {
+      id: "prod-perfume-flora",
+      name: language === "zh" ? "巴黎恋人淡香精 50ml - 花果香调" : language === "en" ? "Amore Eau de Parfum for Women 50ml" : "Perfume Feminino Amore Eau de Parfum 50ml",
+      desc: language === "zh" ? "经典甜美花果香调，前调茉莉中调香草，温婉迷人。" : language === "en" ? "Delicate floral-fruity scent with jasmine and warm vanilla undertones, designed for daily wear." : "Fragrância floral frutada marcante com notas de jasmin e baunilha, ideal para o dia a dia.",
+      image: perfumeFemininoAmore,
+      originalPrice: currency === "BRL" ? 289.90 : currency === "CNY" ? 360.00 : 55.00,
+      promoPrice: currency === "BRL" ? 59.90 : currency === "CNY" ? 75.00 : 12.00,
+      stockPercent: 93,
+      itemsLeft: 2,
+      badge: language === "zh" ? "香氛大赏" : language === "en" ? "Trending" : "Destaque"
     }
   ];
 
