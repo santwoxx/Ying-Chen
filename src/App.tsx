@@ -6,9 +6,9 @@ import QrCodeToggler from "./components/QrCodeToggler";
 import RedPocketGift from "./components/RedPocketGift";
 
 // Import images for proper static building and hashing by Vite
-import vestidoFloralBoho from "./assets/images/vestido_floral_boho.png";
-import camisaBrasilAmarela from "./assets/images/camisa_brasil_amarela.png";
-import camisaBrasilPreta from "./assets/images/camisa_brasil_preta.png";
+import serumSkincareGlow from "./assets/images/serum_skincare_glow.png";
+import conjuntoColarCoracao from "./assets/images/conjunto_colar_coracao.png";
+import tenisCasualFeminino from "./assets/images/tenis_casual_feminino.png";
 
 // Lucide icons
 import { 
@@ -382,29 +382,31 @@ export default function App() {
     }
   };
 
+  // Live simulation notifications loop
   useEffect(() => {
     const messages = {
       pt: [
-        "Maria S. de São Paulo comprou SHEIN Vestido Verão Praia Estampa Floral Boho",
+        "Maria S. de São Paulo comprou Sérum Facial Hidratante Ácido Hialurônico Glow",
         "Carlos R. de Curitiba resgatou cupom CHINA666 com sucesso!",
-        "Ana B. de Porto Alegre comprou Camisa Oficial Seleção Brasileira Nike I 2026",
+        "Ana B. de Porto Alegre comprou Kit Conjunto Colar e Brincos Coração",
         "Juliana F. resgatou R$ 189,50 de cashback na carteira VIP",
-        "Roberto M. comprou Camisa Seleção Brasileira Treino 2026 - Preta"
+        "Roberto M. comprou Tênis Casual Feminino Soft Walk"
       ],
       zh: [
-        "张*珍（圣保罗）成功使用首单优惠券购买了碎花沙滩连衣裙",
+        "张*珍（圣保罗）成功使用首单优惠券购买了玻尿酸补水精华液",
         "李*国（北京）成功领取了双十一 1 折专享红包",
         "王*伟（深圳）已激活海外尊享 VIP 买手通道",
         "陈*（广州）刚刚获得了 ¥189.50 现金返还",
-        "卢*（里约）购买了巴西国足黑色训练服，预计3天送达"
+        "卢*（里约）购买了轻便防滑休闲运动鞋，预计3天送达"
       ],
       en: [
-        "Maria S. from Sao Paulo bought Floral Print Boho Summer Beach Dress (90% OFF)",
+        "Maria S. from Sao Paulo bought Glow Skincare Hyaluronic Acid Serum (90% OFF)",
         "Carlos R. from Curitiba claimed code CHINA666 successfully!",
         "Juliana F. claimed $189.50 VIP cashback in her wallet",
-        "Carlos R. from Curitiba purchased Brazil Nike Home 2026/27 Pro Jersey - Yellow"
+        "Carlos R. from Curitiba purchased Soft Walk Lightweight Women's Sneakers"
       ]
     }[language];
+
     const triggerNotification = () => {
       const idx = Math.floor(Math.random() * messages.length);
       setLiveNotification(messages[idx]);
@@ -442,8 +444,8 @@ export default function App() {
       howToTest: "Como funciona este teste local?",
       promptDesc: "O frontend se conecta de forma segura ao back-end que gerencia os usuários em users.json.",
       logoutBtn: "Encerrar Sessão",
-      productsTitle: "Ofertas da Temporada - Roupas & Mantos da Seleção",
-      productsSub: "Vestido de verão e mantos oficiais da Seleção Brasileira com 90% OFF usando o cupom",
+      productsTitle: "Ofertas da Temporada - Preferidos das Mulheres",
+      productsSub: "Os produtos de skincare, calçados macios e acessórios mais desejados com 90% OFF usando o cupom",
       buyNow: "Resgatar Oferta VIP"
     },
     zh: {
@@ -465,8 +467,8 @@ export default function App() {
       howToTest: "此本地测试如何运作？",
       promptDesc: "前端与后端进行安全连接，并将用户数据 and 输入的密码保存至本地 users.json 文件里。",
       logoutBtn: "退出登录",
-      productsTitle: "春季时尚热卖 • 巴西国足战袍专区",
-      productsSub: "精选时尚女装与超值巴西国家队球衣，输入迎新码自动抵扣 90%",
+      productsTitle: "春季女性好物 • 专属满减区",
+      productsSub: "精选护肤精粹、经典美饰与舒适休闲鞋，输入迎新码自动抵扣 90%",
       buyNow: "一键 Resgatar 优惠"
     },
     en: {
@@ -488,8 +490,8 @@ export default function App() {
       howToTest: "How does this local test work?",
       promptDesc: "The frontend connects securely to the backend which manages all credentials on users.json.",
       logoutBtn: "Sign Out",
-      productsTitle: "Limited Season Deals - Apparel & Brazil Jerseys",
-      productsSub: "Boho summer dresses and cheap replica Brazil National Team jerseys at 90% OFF",
+      productsTitle: "Limited Season Deals - Women's Favorites",
+      productsSub: "Top-selling skincare, comfortable sneakers, and gold jewelry at 90% OFF with Welcome Coupon",
       buyNow: "Secure VIP Deal"
     }
   }[language];
@@ -497,37 +499,37 @@ export default function App() {
   // Premium Chinese clothing items to promote
   const clothingProducts = [
     {
-      id: "prod-floral-boho",
-      name: language === "zh" ? "SHEIN 挂脖露背碎花海滩连衣长裙" : language === "en" ? "SHEIN Floral Print Boho Summer Beach Dress" : "SHEIN Vestido Verão Praia Estampa Floral Boho",
-      desc: language === "zh" ? "夏季凉爽雪纺面料，波西米亚挂脖收腰设计，甜美飘逸。" : language === "en" ? "Lightweight summer chiffon fabric, bohemian halter waist design, sweet and flowing." : "Tecido leve de verão, estampa floral multicolorida, decote em V e cintura alta evasê estilo boho.",
-      image: vestidoFloralBoho,
-      originalPrice: currency === "BRL" ? 120.00 : currency === "CNY" ? 160.00 : 24.00,
-      promoPrice: currency === "BRL" ? 78.71 : currency === "CNY" ? 108.00 : 15.00,
-      stockPercent: 92,
-      itemsLeft: 3,
-      badge: language === "zh" ? "热销爆款" : language === "en" ? "Best Seller" : "Mais Vendido"
-    },
-    {
-      id: "prod-camisa-amarela",
-      name: language === "zh" ? "Camisa Brasil Nike I 2026/27 黄色球员版" : language === "en" ? "Brazil Nike Home 2026/27 Pro Jersey - Yellow" : "Camisa Oficial Seleção Brasileira Nike I 2026 - Amarela",
-      desc: language === "zh" ? "巴西队经典黄绿战袍，超薄透气面料，2026美加墨世界杯同款。" : language === "en" ? "Classic yellow and green Brazil kit, ultra-breathable tech fabric, 2026 World Cup edition." : "Clássico manto amarelo e verde da seleção, tecido Aero-FIT respirável, modelo jogador Pro da Copa 2026.",
-      image: camisaBrasilAmarela,
-      originalPrice: currency === "BRL" ? 399.90 : currency === "CNY" ? 499.00 : 75.00,
-      promoPrice: currency === "BRL" ? 49.90 : currency === "CNY" ? 65.00 : 9.50,
-      stockPercent: 97,
-      itemsLeft: 2,
-      badge: language === "zh" ? "热卖推荐" : language === "en" ? "Hot Seller" : "Campeão de Vendas"
-    },
-    {
-      id: "prod-camisa-preta",
-      name: language === "zh" ? "Camisa Brasil Nike 黑色训练版 2026" : language === "en" ? "Brazil Nike 2026 Training Jersey - Black" : "Camisa Seleção Brasileira Treino 2026 - Preta",
-      desc: language === "zh" ? "全黑底色搭配醒目绿黄色点缀，训练系列首选，运动舒适。" : language === "en" ? "Sleek black base with vibrant yellow/green details, optimized for training comfort." : "Base preta com detalhes em verde e amarelo, tecido macio de alta performance e absorção de suor.",
-      image: camisaBrasilPreta,
-      originalPrice: currency === "BRL" ? 239.90 : currency === "CNY" ? 299.00 : 45.00,
-      promoPrice: currency === "BRL" ? 39.99 : currency === "CNY" ? 49.00 : 7.50,
+      id: "prod-skincare-serum",
+      name: language === "zh" ? "玻尿酸补水修护面部精华液" : language === "en" ? "Glow Skincare Hyaluronic Acid Serum" : "Sérum Facial Hidratante Ácido Hialurônico Glow",
+      desc: language === "zh" ? "深层补水，紧致修护，打造韩式水光肌，温和无刺激。" : language === "en" ? "Deep hydration and barrier repair for a radiant, glowing complexion." : "Hidratação profunda, preenchimento de linhas finas e efeito pele iluminada (Glow) natural.",
+      image: serumSkincareGlow,
+      originalPrice: currency === "BRL" ? 89.90 : currency === "CNY" ? 110.00 : 16.00,
+      promoPrice: currency === "BRL" ? 19.90 : currency === "CNY" ? 25.00 : 4.00,
       stockPercent: 94,
-      itemsLeft: 4,
-      badge: language === "zh" ? "极速出货" : language === "en" ? "Super Value" : "Super Oferta"
+      itemsLeft: 5,
+      badge: language === "zh" ? "护肤必入" : language === "en" ? "Skincare Fav" : "Queridinho"
+    },
+    {
+      id: "prod-jewelry-set",
+      name: language === "zh" ? "极简爱心项链耳环三件套 - 镀18K金" : language === "en" ? "18K Gold Plated Heart Necklace & Earrings Set" : "Kit Conjunto Colar e Brincos Coração - Folheado a Ouro 18k",
+      desc: language === "zh" ? "精致爱心吊坠搭配百搭耳环，防过敏材质，日常优雅配饰。" : language === "en" ? "Elegant heart pendant and matching studs, hypoallergenic, perfect daily accessory." : "Conjunto clássico de colar com pingente e brincos delicados em formato de coração, antialérgico.",
+      image: conjuntoColarCoracao,
+      originalPrice: currency === "BRL" ? 150.00 : currency === "CNY" ? 180.00 : 28.00,
+      promoPrice: currency === "BRL" ? 29.90 : currency === "CNY" ? 38.00 : 6.00,
+      stockPercent: 91,
+      itemsLeft: 3,
+      badge: language === "zh" ? "爆款配饰" : language === "en" ? "Trending Biju" : "Mais Vendido"
+    },
+    {
+      id: "prod-sneakers-soft",
+      name: language === "zh" ? "轻便透气休闲运动鞋 - 软底防滑" : language === "en" ? "Soft Walk Lightweight Casual Women's Sneakers" : "Tênis Casual Feminino Soft Walk - Conforto Dia a Dia",
+      desc: language === "zh" ? "超轻发泡软底，透气网面设计，久站不累脚，防滑耐磨。" : language === "en" ? "Ultra-lightweight foam sole with breathable mesh, ideal for walking and standing all day." : "Solado macio ultra leve com amortecimento, cabedal respirável, ideal para caminhadas e rotina.",
+      image: tenisCasualFeminino,
+      originalPrice: currency === "BRL" ? 269.90 : currency === "CNY" ? 320.00 : 49.00,
+      promoPrice: currency === "BRL" ? 49.90 : currency === "CNY" ? 60.00 : 9.90,
+      stockPercent: 96,
+      itemsLeft: 2,
+      badge: language === "zh" ? "限时特惠" : language === "en" ? "Comfort Fit" : "Campeão de Vendas"
     }
   ];
 
