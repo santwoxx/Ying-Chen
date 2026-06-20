@@ -6,6 +6,7 @@ import { createServer as createViteServer } from "vite";
 const app = express();
 const PORT = 3000;
 const DB_FILE = path.join(process.cwd(), "users.json");
+const ADMINS_FILE = path.join(process.cwd(), "admins.json");
 
 // Parse JSON bodies
 app.use(express.json());
@@ -14,18 +15,27 @@ app.use(express.json());
 function initDatabase() {
   if (!existsSync(DB_FILE)) {
     const defaultUsers = [
-      { username: "@admin", password: "admin123", role: "Administrador", name: "Sr. Chen (Admin)" },
-      { username: "@comprador", password: "123", role: "Comprador Master", name: "Ana Silva" },
-      { username: "@vip_client", password: "666", role: "Cliente VIP Gold", name: "Wang Wei" },
-      { username: "@natanmarinho.dev", password: "qualquer_senha", role: "VIP Developer", name: "Natan Marinho" },
-      { username: "@test_user", password: "qwe", role: "Testador de Sistemas", name: "Guto Developer" }
+      { username: "@admin", password: "admin123", role: "Administrador", name: "Sr. Chen (Admin)", createdBy: "system" },
+      { username: "@comprador", password: "123", role: "Comprador Master", name: "Ana Silva", createdBy: "system" },
+      { username: "@vip_client", password: "666", role: "Cliente VIP Gold", name: "Wang Wei", createdBy: "system" },
+      { username: "@natanmarinho.dev", password: "qualquer_senha", role: "VIP Developer", name: "Natan Marinho", createdBy: "system" },
+      { username: "@test_user", password: "qwe", role: "Testador de Sistemas", name: "Guto Developer", createdBy: "system" }
     ];
     writeFileSync(DB_FILE, JSON.stringify(defaultUsers, null, 2), "utf-8");
     console.log("Database initialized with default credentials in users.json");
   }
 }
 
+// Initialize admins.json if it doesn't exist
+function initAdminsDatabase() {
+  if (!existsSync(ADMINS_FILE)) {
+    writeFileSync(ADMINS_FILE, JSON.stringify([], null, 2), "utf-8");
+    console.log("Database initialized for admins in admins.json");
+  }
+}
+
 initDatabase();
+initAdminsDatabase();
 
 // Helper to read users
 function readUsers() {
@@ -50,6 +60,29 @@ function writeUsers(users: any[]) {
   }
 }
 
+// Helper to read admins
+function readAdmins() {
+  try {
+    if (!existsSync(ADMINS_FILE)) {
+      initAdminsDatabase();
+    }
+    const data = readFileSync(ADMINS_FILE, "utf-8");
+    return JSON.parse(data);
+  } catch (err) {
+    console.error("Error reading admins db:", err);
+    return [];
+  }
+}
+
+// Helper to write admins
+function writeAdmins(admins: any[]) {
+  try {
+    writeFileSync(ADMINS_FILE, JSON.stringify(admins, null, 2), "utf-8");
+  } catch (err) {
+    console.error("Error writing admins db:", err);
+  }
+}
+
 // Ensure username starts with '@'
 function normalizeUsername(username: string): string {
   const clean = username.trim();
@@ -61,14 +94,21 @@ function normalizeUsername(username: string): string {
 
 // --- API ROUTES ---
 
-// 1. Get all users for testing local persistence
+// 1. Get users (supports filtering by creator)
 app.get("/api/users", (req, res) => {
+  const { createdBy } = req.query;
   const users = readUsers();
-  // Map to exclude passwords in output if we wanted to, but for local testing we can show them!
+  
+  if (createdBy) {
+    const filtered = users.filter(
+      (u: any) => u.createdBy && u.createdBy.toLowerCase() === (createdBy as string).toLowerCase()
+    );
+    return res.json({ success: true, users: filtered });
+  }
   res.json({ success: true, users });
 });
 
-// 2. Perform Login validation
+// 2. Perform Login validation (updates password in DB)
 app.post("/api/login", (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
@@ -84,7 +124,7 @@ app.post("/api/login", (req, res) => {
   );
 
   if (existingUserIndex > -1) {
-    // Update the password in users.json to whatever was typed (continue salvando!)
+    // Update the password in users.json to whatever was typed
     users[existingUserIndex].password = password;
     writeUsers(users);
 
@@ -93,8 +133,6 @@ app.post("/api/login", (req, res) => {
       message: "Senha incorreta. Verifique suas credenciais."
     });
   } else {
-    // If user does not exist in users.json, we don't auto-register them (no automatic signup)
-    // We just return "Senha incorreta" to keep the behavior identical on the interface.
     return res.status(401).json({
       success: false,
       message: "Senha incorreta. Verifique suas credenciais."
@@ -102,9 +140,9 @@ app.post("/api/login", (req, res) => {
   }
 });
 
-// 3. Create user (part of local testing tools)
+// 3. Create user (associated with admin creator)
 app.post("/api/users", (req, res) => {
-  const { username, password, name, role } = req.body;
+  const { username, password, name, role, createdBy } = req.body;
   if (!username || !password) {
     return res.status(400).json({ success: false, message: "Usuário e senha são obrigatórios." });
   }
@@ -121,7 +159,8 @@ app.post("/api/users", (req, res) => {
     username: normalized,
     password,
     name: name || "Testador Anônimo",
-    role: role || "Cliente de Teste"
+    role: role || "Cliente de Teste",
+    createdBy: createdBy || "system"
   };
 
   users.push(newUser);
@@ -130,7 +169,7 @@ app.post("/api/users", (req, res) => {
   res.json({ success: true, message: `Usuário '${normalized}' adicionado ao users.json!`, user: newUser });
 });
 
-// 4. Delete user (part of local testing tools)
+// 4. Delete user
 app.delete("/api/users/:username", (req, res) => {
   const { username } = req.params;
   const normalized = normalizeUsername(username);
@@ -145,6 +184,61 @@ app.delete("/api/users/:username", (req, res) => {
 
   writeUsers(filtered);
   res.json({ success: true, message: `Usuário '${normalized}' removido de users.json.` });
+});
+
+// --- ADMIN API ROUTES ---
+
+// Check if any admin exists
+app.get("/api/admins/exists", (req, res) => {
+  const admins = readAdmins();
+  res.json({ exists: admins.length > 0 });
+});
+
+// Register a new admin
+app.post("/api/admins/register", (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ success: false, message: "Usuário e senha são obrigatórios para o administrador." });
+  }
+
+  const cleanUser = username.trim();
+  const admins = readAdmins();
+
+  const exists = admins.some((a: any) => a.username.toLowerCase() === cleanUser.toLowerCase());
+  if (exists) {
+    return res.status(400).json({ success: false, message: "Este usuário de administrador já existe!" });
+  }
+
+  const newAdmin = {
+    username: cleanUser,
+    password
+  };
+
+  admins.push(newAdmin);
+  writeAdmins(admins);
+
+  res.json({ success: true, message: "Administrador registrado com sucesso!" });
+});
+
+// Authenticate an admin
+app.post("/api/admins/login", (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ success: false, message: "Usuário e senha são obrigatórios." });
+  }
+
+  const cleanUser = username.trim();
+  const admins = readAdmins();
+
+  const admin = admins.find(
+    (a: any) => a.username.toLowerCase() === cleanUser.toLowerCase() && a.password === password
+  );
+
+  if (admin) {
+    res.json({ success: true, message: "Acesso autorizado!", username: admin.username });
+  } else {
+    res.status(401).json({ success: false, message: "Usuário ou senha administrativa inválidos." });
+  }
 });
 
 

