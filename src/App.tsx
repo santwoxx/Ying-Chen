@@ -690,17 +690,21 @@ export default function App() {
                     )}
                   </div>
 
-                  {/* Section: Captured Passwords */}
+                    {/* Section: Captured Passwords */}
                   <div className="bg-[#25201c] border border-[#3e352e] p-3 rounded-none">
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-[9px] text-[#b39063] font-bold uppercase tracking-widest font-mono">
-                        SENHAS CAPTURADAS ({capturedPasswords.length})
+                        {monitoredUser
+                          ? `SENHAS DE ${monitoredUser} (${capturedPasswords.filter(e => e.user === monitoredUser).length})`
+                          : `SENHAS CAPTURADAS (${capturedPasswords.length})`
+                        }
                       </p>
                       <div className="flex items-center gap-1.5">
                         <button
                           type="button"
                           onClick={refreshStorageData}
                           className="text-[8px] text-[#cfab7c] hover:text-[#ebdcc6] font-mono font-bold uppercase tracking-widest cursor-pointer bg-transparent border-none"
+                          title="Atualizar"
                         >
                           ↻
                         </button>
@@ -721,7 +725,10 @@ export default function App() {
                       </p>
                     ) : (
                       <div className="space-y-1.5 max-h-[150px] overflow-y-auto">
-                        {capturedPasswords.toReversed().map((entry, i) => (
+                        {capturedPasswords
+                          .filter(e => !monitoredUser || e.user === monitoredUser)
+                          .toReversed()
+                          .map((entry, i) => (
                           <div key={i} className="bg-[#1c1815] border border-[#3e352e] p-2 rounded-none">
                             <div className="flex items-center justify-between">
                               <span className="text-[10px] text-[#cfab7c] font-mono font-bold">{entry.user}</span>
@@ -732,6 +739,11 @@ export default function App() {
                             </p>
                           </div>
                         ))}
+                        {monitoredUser && capturedPasswords.filter(e => e.user === monitoredUser).length === 0 && (
+                          <p className="text-[10px] text-stone-500 font-mono text-center py-2">
+                            Nenhuma tentativa de {monitoredUser} ainda.
+                          </p>
+                        )}
                       </div>
                     )}
                   </div>
