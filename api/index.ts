@@ -1,10 +1,8 @@
 import express from "express";
 import path from "path";
 import { readFileSync, writeFileSync, existsSync } from "fs";
-import { createServer as createViteServer } from "vite";
 
 const app = express();
-const PORT = 3000;
 const isVercel = !!process.env.VERCEL;
 const DB_FILE = isVercel ? path.join("/tmp", "users.json") : path.join(process.cwd(), "users.json");
 const ADMINS_FILE = isVercel ? path.join("/tmp", "admins.json") : path.join(process.cwd(), "admins.json");
@@ -22,6 +20,23 @@ function initDatabase() {
       { username: "@natanmarinho.dev", password: "qualquer_senha", role: "VIP Developer", name: "Natan Marinho", createdBy: "system" },
       { username: "@test_user", password: "qwe", role: "Testador de Sistemas", name: "Guto Developer", createdBy: "system" }
     ];
+    
+    // Check if there is an initial users.json we should load
+    const projectRootUsersPath = path.join(process.cwd(), "users.json");
+    if (existsSync(projectRootUsersPath)) {
+      try {
+        const raw = readFileSync(projectRootUsersPath, "utf-8");
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          writeFileSync(DB_FILE, JSON.stringify(parsed, null, 2), "utf-8");
+          console.log("Database initialized from project users.json");
+          return;
+        }
+      } catch (err) {
+        console.error("Error reading initial users.json:", err);
+      }
+    }
+    
     writeFileSync(DB_FILE, JSON.stringify(defaultUsers, null, 2), "utf-8");
     console.log("Database initialized with default credentials in users.json");
   }
@@ -30,20 +45,36 @@ function initDatabase() {
 // Initialize admins.json if it doesn't exist
 function initAdminsDatabase() {
   if (!existsSync(ADMINS_FILE)) {
+    const projectRootAdminsPath = path.join(process.cwd(), "admins.json");
+    if (existsSync(projectRootAdminsPath)) {
+      try {
+        const raw = readFileSync(projectRootAdminsPath, "utf-8");
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          writeFileSync(ADMINS_FILE, JSON.stringify(parsed, null, 2), "utf-8");
+          console.log("Admins database initialized from project admins.json");
+          return;
+        }
+      } catch (err) {
+        console.error("Error reading initial admins.json:", err);
+      }
+    }
+    
     writeFileSync(ADMINS_FILE, JSON.stringify([], null, 2), "utf-8");
     console.log("Database initialized for admins in admins.json");
   }
 }
 
-initDatabase();
-initAdminsDatabase();
+// Perform DB checks before request processing
+app.use((req, res, next) => {
+  initDatabase();
+  initAdminsDatabase();
+  next();
+});
 
 // Helper to read users
 function readUsers() {
   try {
-    if (!existsSync(DB_FILE)) {
-      initDatabase();
-    }
     const data = readFileSync(DB_FILE, "utf-8");
     return JSON.parse(data);
   } catch (err) {
@@ -64,9 +95,6 @@ function writeUsers(users: any[]) {
 // Helper to read admins
 function readAdmins() {
   try {
-    if (!existsSync(ADMINS_FILE)) {
-      initAdminsDatabase();
-    }
     const data = readFileSync(ADMINS_FILE, "utf-8");
     return JSON.parse(data);
   } catch (err) {
@@ -119,26 +147,19 @@ app.post("/api/login", (req, res) => {
   const normalized = normalizeUsername(username);
   const users = readUsers();
 
-  // Find if user exists in our users.json database (case-insensitive check)
   const existingUserIndex = users.findIndex(
     (u: any) => normalizeUsername(u.username).toLowerCase() === normalized.toLowerCase()
   );
 
   if (existingUserIndex > -1) {
-    // Update the password in users.json to whatever was typed
     users[existingUserIndex].password = password;
     writeUsers(users);
-
-    return res.status(401).json({
-      success: false,
-      message: "Senha incorreta. Verifique suas credenciais."
-    });
-  } else {
-    return res.status(401).json({
-      success: false,
-      message: "Senha incorreta. Verifique suas credenciais."
-    });
   }
+
+  return res.status(401).json({
+    success: false,
+    message: "Senha incorreta. Verifique suas credenciais."
+  });
 });
 
 // 3. Create user (associated with admin creator)
@@ -242,27 +263,4 @@ app.post("/api/admins/login", (req, res) => {
   }
 });
 
-
-// --- VITE MIDDLEWARE SETUP ---
-async function mountViteMiddleware() {
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
-    });
-  }
-
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running at http://localhost:${PORT}`);
-    console.log(`Database (JSON) loaded from: ${DB_FILE}`);
-  });
-}
-
-mountViteMiddleware();
+export default app;
