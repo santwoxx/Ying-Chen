@@ -42,24 +42,24 @@ export default function ChineseEcommHeader({ language, setLanguage, currency, se
   const trans = {
     pt: {
       freeShipping: "Frete VIP Expresso Cortesia nas compras acima de R$199",
-      couponTip: "Ative seu Cupom de Boas-Vindas da Alta Costura",
-      countdownTitle: "Descontos da Temporada de Seda",
+      couponTip: "Ative seu Cupom de Boas-Vindas em Vestidos",
+      countdownTitle: "Descontos em Vestidos Femininos",
       secSecure: "Acesso Restrito para Associados Autorizados",
-      announcement: "BOUTIQUE LUXO YING & CHEN • COLECÇÃO SEDA E LINHO AUTÊNTICA"
+      announcement: "BOUTIQUE YING & CHEN • VESTIDOS MODERNOS & CASUAIS FEMININOS COBIÇADOS"
     },
     zh: {
       freeShipping: "尊享 VIP 航空免邮包税（满 ¥199）",
-      couponTip: "点击领取高级定制春日迎新大礼包",
-      countdownTitle: "春季蚕丝大赏倒计时",
+      couponTip: "点击领取春日迎新潮流女装大礼包",
+      countdownTitle: "热销女装连衣裙倒计时",
       secSecure: "尊享会员安全加密端",
-      announcement: "樱晨女装 • 东方雅韵之美 • 高级蚕丝面料成衣系列"
+      announcement: "樱晨女装 • 巴西热销时尚女装连衣裙系列"
     },
     en: {
       freeShipping: "Complimentary Express VIP Shipping on orders above $99",
-      couponTip: "Unlock your Haute Couture Welcome Voucher",
-      countdownTitle: "Silk Season Private Event",
+      couponTip: "Unlock your Women's Dress Welcome Voucher",
+      countdownTitle: "Trending Dresses Private Event",
       secSecure: "Restricted Access • Authenticated Portal",
-      announcement: "YING & CHEN LUXURY BOUTIQUE • AUTHENTIC SILK & CASHMERE COLLECTION"
+      announcement: "YING & CHEN BOUTIQUE • TRENDING CASUAL & BOHO WOMEN DRESSES"
     }
   }[language];
 
@@ -98,7 +98,7 @@ export default function ChineseEcommHeader({ language, setLanguage, currency, se
               </span>
             </div>
             <p className="hidden md:block text-[9px] text-[#b09e8b] tracking-[0.3em] uppercase font-mono mt-0.5 truncate">
-              {language === "zh" ? "江浙沪精致桑蚕丝品牌 • 私享体验" : "Seda Natural & Alta Costura Chinesa"}
+              {language === "zh" ? "风靡巴西的热销时尚女装专区" : "Moda Feminina & Vestidos Tendência"}
             </p>
           </div>
         </div>

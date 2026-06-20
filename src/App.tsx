@@ -5,6 +5,11 @@ import LocalDbManager from "./components/LocalDbManager";
 import QrCodeToggler from "./components/QrCodeToggler";
 import RedPocketGift from "./components/RedPocketGift";
 
+// Import images for proper static building and hashing by Vite
+import vestidoFloralBoho from "./assets/images/vestido_floral_boho.png";
+import vestidoMidiPlissado from "./assets/images/vestido_midi_plissado.png";
+import vestidoMidiValentine from "./assets/images/vestido_midi_valentine.png";
+
 // Lucide icons
 import { 
   User as UserIcon, 
@@ -381,26 +386,24 @@ export default function App() {
   useEffect(() => {
     const messages = {
       pt: [
-        "Maria S. de São Paulo comprou Qipao de Seda Imperial (90% OFF)",
+        "Maria S. de São Paulo comprou SHEIN Vestido Verão Praia Estampa Floral Boho",
         "Carlos R. de Curitiba resgatou cupom CHINA666 com sucesso!",
         "Ana B. de Porto Alegre ativou convite de Comprador VIP",
-        "Wang W. de Pequim finalizou pedido no Ateliê de Seda",
         "Juliana F. resgatou R$ 189,50 de cashback na carteira VIP",
-        "Roberto M. comprou Casaco Imperial Bordado Dragão"
+        "Roberto M. comprou Selianne Vestido Midi Plissado Evasê Damasco"
       ],
       zh: [
-        "张*珍（上海）成功使用首单优惠券购买了真丝旗袍连衣裙",
+        "张*珍（圣保罗）成功使用首单优惠券购买了碎花沙滩连衣裙",
         "李*国（北京）成功领取了双十一 1 折专享红包",
         "王*伟（深圳）已激活海外尊享 VIP 买手通道",
         "陈*（广州）刚刚获得了 ¥189.50 现金返还",
-        "刘*（杭州）购买了重工刺绣亚麻外套，预计3天送达"
+        "卢*（里约）购买了百褶蝙蝠袖连衣裙，预计3天送达"
       ],
       en: [
-        "Maria S. from Sao Paulo bought Imperial Silk Qipao (90% OFF)",
+        "Maria S. from Sao Paulo bought Floral Print Boho Summer Beach Dress (90% OFF)",
         "Carlos R. from Curitiba claimed code CHINA666 successfully!",
-        "Wang W. from Beijing completed a luxury silk purchase",
         "Juliana F. claimed $189.50 VIP cashback in her wallet",
-        "Robert M. purchased Golden Dragon Linen Coat"
+        "Carlos R. from Curitiba purchased Pleated Slim Fit Midi Dress"
       ]
     }[language];
 
@@ -441,8 +444,8 @@ export default function App() {
       howToTest: "Como funciona este teste local?",
       promptDesc: "O frontend se conecta de forma segura ao back-end que gerencia os usuários em users.json.",
       logoutBtn: "Encerrar Sessão",
-      productsTitle: "Descontos da Temporada - Primavera Chinesa",
-      productsSub: "Coleções de Seda e Linho Imperial com 90% OFF usando o cupom de Boas-Vindas",
+      productsTitle: "Ofertas da Temporada - Tendências Femininas",
+      productsSub: "Vestidos casuais, florais e plissados com 90% OFF usando o cupom de Boas-Vindas",
       buyNow: "Resgatar Oferta VIP"
     },
     zh: {
@@ -452,7 +455,7 @@ export default function App() {
       enterLoading: "正在安全验证...",
       methodPass: "密码账户登录",
       methodQR: "二维码扫码",
-      noRegister: "仅限经海关核准的注册受邀境外VIP买手登录。",
+      noRegister: "仅限经海关核准 of 注册受邀境外VIP买手登录。",
       terms: "登录即代表您同意淘宝全球买手使用条款及跨境采购协议。",
       logisticsTitle: "最新物流包裹状态",
       logisticsStep: "【深圳市】 国际分拨中心已揽收，正出境发往国际仓",
@@ -464,8 +467,8 @@ export default function App() {
       howToTest: "此本地测试如何运作？",
       promptDesc: "前端与后端进行安全连接，并将用户数据 and 输入的密码保存至本地 users.json 文件里。",
       logoutBtn: "退出登录",
-      productsTitle: "春季蚕丝大赏 • 专属满减区",
-      productsSub: "尊享皇家级真丝与高密亚麻材质，输入迎新码自动抵扣 90%",
+      productsTitle: "春季时尚女装 • 专属满减区",
+      productsSub: "甄选巴西热销爆款连衣裙与日常美衣，输入迎新码自动抵扣 90%",
       buyNow: "一键 Resgatar 优惠"
     },
     en: {
@@ -487,8 +490,8 @@ export default function App() {
       howToTest: "How does this local test work?",
       promptDesc: "The frontend connects securely to the backend which manages all credentials on users.json.",
       logoutBtn: "Sign Out",
-      productsTitle: "Limited Season Deals - Silk & Linen",
-      productsSub: "Indulge in organic Chinese silk and artisan linen at 90% OFF with Welcome Coupon",
+      productsTitle: "Limited Season Deals - Women's Trending Dresses",
+      productsSub: "Trending casual dresses and elegant floral prints at 90% OFF with Welcome Coupon",
       buyNow: "Secure VIP Deal"
     }
   }[language];
@@ -496,34 +499,34 @@ export default function App() {
   // Premium Chinese clothing items to promote
   const clothingProducts = [
     {
-      id: "prod-qipao",
-      name: language === "zh" ? "改良版真丝印花旗袍连衣裙" : language === "en" ? "Modern Imperial Silk Qipao Dress" : "Qipao Moderno de Seda Imperial",
-      desc: language === "zh" ? "选用100%天然桑蚕丝面料，苏绣工艺细节，演绎东方极简韵致。" : language === "en" ? "100% natural mulberry silk with Suzhou hand-embroidery." : "Confeccionado em seda pura 100% amoreira, com detalhes bordados à mão de Suzhou.",
-      image: "/src/assets/images/qipao_silk_dress.png",
-      originalPrice: currency === "BRL" ? 999.00 : currency === "CNY" ? 1290.00 : 180.00,
-      promoPrice: currency === "BRL" ? 99.90 : currency === "CNY" ? 129.00 : 18.00,
+      id: "prod-floral-boho",
+      name: language === "zh" ? "SHEIN 挂脖露背碎花海滩连衣长裙" : language === "en" ? "SHEIN Floral Print Boho Summer Beach Dress" : "SHEIN Vestido Verão Praia Estampa Floral Boho",
+      desc: language === "zh" ? "夏季凉爽雪纺面料，波西米亚挂脖收腰设计，甜美飘逸。" : language === "en" ? "Lightweight summer chiffon fabric, bohemian halter waist design, sweet and flowing." : "Tecido leve de verão, estampa floral multicolorida, decote em V e cintura alta evasê estilo boho.",
+      image: vestidoFloralBoho,
+      originalPrice: currency === "BRL" ? 120.00 : currency === "CNY" ? 160.00 : 24.00,
+      promoPrice: currency === "BRL" ? 78.71 : currency === "CNY" ? 108.00 : 15.00,
       stockPercent: 92,
       itemsLeft: 3,
       badge: language === "zh" ? "热销爆款" : language === "en" ? "Best Seller" : "Mais Vendido"
     },
     {
-      id: "prod-coat",
-      name: language === "zh" ? "中式复古盘扣重工刺绣外套" : language === "en" ? "Dragon Golden Thread Linen Coat" : "Casaco Imperial de Linho Dragão",
-      desc: language === "zh" ? "选用高级重磅天然亚麻，胸前盘金丝绣金龙，彰显尊贵雅致。" : language === "en" ? "Premium heavyweight structured linen with gold wire dragon motif." : "Linho pesado premium estruturado, com luxuosos bordados de dragão em fio de ouro.",
-      image: "/src/assets/images/linen_embroidery_coat.png",
-      originalPrice: currency === "BRL" ? 1499.00 : currency === "CNY" ? 1990.00 : 270.00,
-      promoPrice: currency === "BRL" ? 149.90 : currency === "CNY" ? 199.00 : 27.00,
+      id: "prod-midi-plissado",
+      name: language === "zh" ? "Selianne 优雅杏色百褶显瘦连衣裙" : language === "en" ? "Selianne Apricot Pleated Slim Fit Midi Dress" : "Selianne Vestido Midi Plissado Evasê Damasco",
+      desc: language === "zh" ? "优雅圆领蝙蝠袖设计，立体风琴百褶裙摆，适合婚礼与宴会。" : language === "en" ? "Elegant round neck with batwing sleeves, structured pleated skirt, perfect for weddings and cocktails." : "Elegante vestido midi com pregas e mangas morcego, caimento slim fit confortável, perfeito para festas.",
+      image: vestidoMidiPlissado,
+      originalPrice: currency === "BRL" ? 160.00 : currency === "CNY" ? 220.00 : 30.00,
+      promoPrice: currency === "BRL" ? 107.78 : currency === "CNY" ? 149.00 : 20.00,
       stockPercent: 96,
       itemsLeft: 2,
       badge: language === "zh" ? "限量特惠" : language === "en" ? "Limited Edition" : "Lote Limitado"
     },
     {
-      id: "prod-blouse",
-      name: language === "zh" ? "国风哑光双绉真丝竹叶上衣" : language === "en" ? "Bamboo Branch Silk Blouse" : "Bata Le Jardin de Seda Pura",
-      desc: language === "zh" ? "甄选哑光双绉真丝，垂坠感极佳，立领配手工小扣子。" : language === "en" ? "Fine matte crepe silk shirt with delicate bamboo embroideries." : "Seda fosca premium com caimento impecável e discretos bordados de bambu.",
-      image: "/src/assets/images/silk_blouse_jardin.png",
-      originalPrice: currency === "BRL" ? 599.00 : currency === "CNY" ? 790.00 : 110.00,
-      promoPrice: currency === "BRL" ? 59.90 : currency === "CNY" ? 79.00 : 11.00,
+      id: "prod-midi-valentine",
+      name: language === "zh" ? "VALENTINE 泡泡袖英伦刺绣复古连衣裙" : language === "en" ? "Valentine Puff Sleeve Eyelet Embroidery Vintage Dress" : "Vestido Midi Valentine Bordado Inglês Vintage",
+      desc: language === "zh" ? "法式复古刺绣镂空花边，精致泡泡袖与单排扣点缀，温婉大方。" : language === "en" ? "French vintage eyelet embroidery, delicate puff sleeves, and front button details for a classic look." : "Mangas curtas bufantes, bordado inglês delicado, detalhes de botões frontais e barra evasê vintage.",
+      image: vestidoMidiValentine,
+      originalPrice: currency === "BRL" ? 199.00 : currency === "CNY" ? 270.00 : 38.00,
+      promoPrice: currency === "BRL" ? 139.50 : currency === "CNY" ? 189.00 : 26.00,
       stockPercent: 88,
       itemsLeft: 5,
       badge: language === "zh" ? "新品推荐" : language === "en" ? "New Arrival" : "Lançamento VIP"
