@@ -8,7 +8,7 @@
   --breakpoint-xs: 420px;
 }
 
-/* Custom keyframes for Chinese store immersion */
+/* Custom keyframes for SHEIN store layout */
 
 @keyframes scan {
   0% {
@@ -37,7 +37,7 @@
 @keyframes fade-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -48,43 +48,11 @@
 @keyframes scale-up {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.97);
   }
   to {
     opacity: 1;
     transform: scale(1);
-  }
-}
-
-@keyframes border-shimmer {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-@keyframes ambient-glow {
-  0%, 100% {
-    opacity: 0.15;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.25;
-    transform: scale(1.1);
-  }
-}
-
-@keyframes text-glow {
-  0%, 100% {
-    text-shadow: 0 0 4px rgba(207, 171, 124, 0.2);
-  }
-  50% {
-    text-shadow: 0 0 10px rgba(207, 171, 124, 0.6);
   }
 }
 
@@ -94,12 +62,12 @@
     opacity: 1;
   }
   50% {
-    transform: scale(1.05);
-    opacity: 0.8;
+    transform: scale(1.03);
+    opacity: 0.9;
   }
 }
 
-/* Custom Animations using pure CSS for quick implementation */
+/* Custom Animations using pure CSS */
 .animate-scan {
   animation: scan 3s infinite linear;
 }
@@ -109,83 +77,51 @@
 }
 
 .animate-fade-in {
-  animation: fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-scale-up {
-  animation: scale-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: scale-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-pulse-soft {
   animation: pulse-soft 2s infinite ease-in-out;
 }
 
-.animate-border-shimmer {
-  background-size: 200% 200%;
-  animation: border-shimmer 4s infinite linear;
-}
-
-.animate-ambient-glow {
-  animation: ambient-glow 8s infinite ease-in-out;
-}
-
-.animate-text-glow {
-  animation: text-glow 3s infinite ease-in-out;
-}
-
-/* Slim elegant scrollbar design for local database viewer */
+/* Slim elegant scrollbar design matching SHEIN minimalist look */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.3);
+  background: rgba(245, 245, 245, 0.8);
   border-radius: 999px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(207, 171, 124, 0.2);
+  background: rgba(0, 0, 0, 0.15);
   border-radius: 999px;
-  border: 1px solid rgba(28, 24, 21, 0.8);
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(207, 171, 124, 0.5);
+  background: rgba(0, 0, 0, 0.35);
 }
 
-/* Glassmorphism containers */
+/* Glassmorphism containers in light mode */
 .glass-container {
-  background: rgba(28, 24, 21, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(207, 171, 124, 0.15);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
 }
 
 .glass-container-hover {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .glass-container-hover:hover {
-  background: rgba(28, 24, 21, 0.85);
-  border-color: rgba(207, 171, 124, 0.4);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7), 0 0 15px -3px rgba(207, 171, 124, 0.1);
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.08);
 }
 
-/* Premium Gold border gradient helper */
-.gold-gradient-border {
-  position: relative;
-  background: #1c1815;
-  background-clip: padding-box;
-  border: 1px solid transparent;
-}
-.gold-gradient-border::before {
-  content: '';
-  position: absolute;
-  top: 0; right: 0; bottom: 0; left: 0;
-  z-index: -1;
-  margin: -1px;
-  border-radius: inherit;
-  background: linear-gradient(135deg, #cfab7c 0%, #ebdcc6 50%, #6b583f 100%);
-}
-
-/* Chinese lattice border overlay */
+/* Clean grid background overlay for light mode */
 .chinese-lattice-bg {
-  background-image: radial-gradient(rgba(207, 171, 124, 0.05) 1px, transparent 0);
-  background-size: 24px 24px;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 0);
+  background-size: 20px 20px;
 }

