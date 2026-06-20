@@ -42,24 +42,24 @@ export default function ChineseEcommHeader({ language, setLanguage, currency, se
   const trans = {
     pt: {
       freeShipping: "Frete VIP Expresso Cortesia nas compras acima de R$199",
-      couponTip: "Ative seu Cupom de Boas-Vindas em Vestidos",
-      countdownTitle: "Descontos em Vestidos Femininos",
+      couponTip: "Ative seu Cupom de Boas-Vindas em Vestidos & Mantos",
+      countdownTitle: "Descontos da Seleção & Moda",
       secSecure: "Acesso Restrito para Associados Autorizados",
-      announcement: "BOUTIQUE YING & CHEN • VESTIDOS MODERNOS & CASUAIS FEMININOS COBIÇADOS"
+      announcement: "BOUTIQUE YING & CHEN • VESTIDOS MODERNOS & MANTOS OFICIAIS COBIÇADOS EM PROMOÇÃO"
     },
     zh: {
       freeShipping: "尊享 VIP 航空免邮包税（满 ¥199）",
-      couponTip: "点击领取春日迎新潮流女装大礼包",
-      countdownTitle: "热销女装连衣裙倒计时",
+      couponTip: "点击领取春日迎新国足战袍与女装礼包",
+      countdownTitle: "国足战袍与女装倒计时",
       secSecure: "尊享会员安全加密端",
-      announcement: "樱晨女装 • 巴西热销时尚女装连衣裙系列"
+      announcement: "樱晨服饰 • 巴西热销时尚女装与精选经典球衣系列"
     },
     en: {
       freeShipping: "Complimentary Express VIP Shipping on orders above $99",
-      couponTip: "Unlock your Women's Dress Welcome Voucher",
-      countdownTitle: "Trending Dresses Private Event",
+      couponTip: "Unlock your Apparel & Soccer Jersey Voucher",
+      countdownTitle: "Apparel & Brazil Jerseys Event",
       secSecure: "Restricted Access • Authenticated Portal",
-      announcement: "YING & CHEN BOUTIQUE • TRENDING CASUAL & BOHO WOMEN DRESSES"
+      announcement: "YING & CHEN BOUTIQUE • TRENDING WOMEN DRESSES & BRASIL JERSEY REPLICAS"
     }
   }[language];
 
@@ -98,7 +98,7 @@ export default function ChineseEcommHeader({ language, setLanguage, currency, se
               </span>
             </div>
             <p className="hidden md:block text-[9px] text-[#b09e8b] tracking-[0.3em] uppercase font-mono mt-0.5 truncate">
-              {language === "zh" ? "风靡巴西的热销时尚女装专区" : "Moda Feminina & Vestidos Tendência"}
+              {language === "zh" ? "风靡巴西的热销时尚女装与经典球衣专区" : "Moda Feminina & Mantos da Seleção"}
             </p>
           </div>
         </div>

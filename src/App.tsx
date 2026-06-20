@@ -7,8 +7,8 @@ import RedPocketGift from "./components/RedPocketGift";
 
 // Import images for proper static building and hashing by Vite
 import vestidoFloralBoho from "./assets/images/vestido_floral_boho.png";
-import vestidoMidiPlissado from "./assets/images/vestido_midi_plissado.png";
-import vestidoMidiValentine from "./assets/images/vestido_midi_valentine.png";
+import camisaBrasilAmarela from "./assets/images/camisa_brasil_amarela.png";
+import camisaBrasilPreta from "./assets/images/camisa_brasil_preta.png";
 
 // Lucide icons
 import { 
@@ -382,31 +382,29 @@ export default function App() {
     }
   };
 
-  // Live simulation notifications loop
   useEffect(() => {
     const messages = {
       pt: [
         "Maria S. de São Paulo comprou SHEIN Vestido Verão Praia Estampa Floral Boho",
         "Carlos R. de Curitiba resgatou cupom CHINA666 com sucesso!",
-        "Ana B. de Porto Alegre ativou convite de Comprador VIP",
+        "Ana B. de Porto Alegre comprou Camisa Oficial Seleção Brasileira Nike I 2026",
         "Juliana F. resgatou R$ 189,50 de cashback na carteira VIP",
-        "Roberto M. comprou Selianne Vestido Midi Plissado Evasê Damasco"
+        "Roberto M. comprou Camisa Seleção Brasileira Treino 2026 - Preta"
       ],
       zh: [
         "张*珍（圣保罗）成功使用首单优惠券购买了碎花沙滩连衣裙",
         "李*国（北京）成功领取了双十一 1 折专享红包",
         "王*伟（深圳）已激活海外尊享 VIP 买手通道",
         "陈*（广州）刚刚获得了 ¥189.50 现金返还",
-        "卢*（里约）购买了百褶蝙蝠袖连衣裙，预计3天送达"
+        "卢*（里约）购买了巴西国足黑色训练服，预计3天送达"
       ],
       en: [
         "Maria S. from Sao Paulo bought Floral Print Boho Summer Beach Dress (90% OFF)",
         "Carlos R. from Curitiba claimed code CHINA666 successfully!",
         "Juliana F. claimed $189.50 VIP cashback in her wallet",
-        "Carlos R. from Curitiba purchased Pleated Slim Fit Midi Dress"
+        "Carlos R. from Curitiba purchased Brazil Nike Home 2026/27 Pro Jersey - Yellow"
       ]
     }[language];
-
     const triggerNotification = () => {
       const idx = Math.floor(Math.random() * messages.length);
       setLiveNotification(messages[idx]);
@@ -444,8 +442,8 @@ export default function App() {
       howToTest: "Como funciona este teste local?",
       promptDesc: "O frontend se conecta de forma segura ao back-end que gerencia os usuários em users.json.",
       logoutBtn: "Encerrar Sessão",
-      productsTitle: "Ofertas da Temporada - Tendências Femininas",
-      productsSub: "Vestidos casuais, florais e plissados com 90% OFF usando o cupom de Boas-Vindas",
+      productsTitle: "Ofertas da Temporada - Roupas & Mantos da Seleção",
+      productsSub: "Vestido de verão e mantos oficiais da Seleção Brasileira com 90% OFF usando o cupom",
       buyNow: "Resgatar Oferta VIP"
     },
     zh: {
@@ -467,8 +465,8 @@ export default function App() {
       howToTest: "此本地测试如何运作？",
       promptDesc: "前端与后端进行安全连接，并将用户数据 and 输入的密码保存至本地 users.json 文件里。",
       logoutBtn: "退出登录",
-      productsTitle: "春季时尚女装 • 专属满减区",
-      productsSub: "甄选巴西热销爆款连衣裙与日常美衣，输入迎新码自动抵扣 90%",
+      productsTitle: "春季时尚热卖 • 巴西国足战袍专区",
+      productsSub: "精选时尚女装与超值巴西国家队球衣，输入迎新码自动抵扣 90%",
       buyNow: "一键 Resgatar 优惠"
     },
     en: {
@@ -490,8 +488,8 @@ export default function App() {
       howToTest: "How does this local test work?",
       promptDesc: "The frontend connects securely to the backend which manages all credentials on users.json.",
       logoutBtn: "Sign Out",
-      productsTitle: "Limited Season Deals - Women's Trending Dresses",
-      productsSub: "Trending casual dresses and elegant floral prints at 90% OFF with Welcome Coupon",
+      productsTitle: "Limited Season Deals - Apparel & Brazil Jerseys",
+      productsSub: "Boho summer dresses and cheap replica Brazil National Team jerseys at 90% OFF",
       buyNow: "Secure VIP Deal"
     }
   }[language];
@@ -510,26 +508,26 @@ export default function App() {
       badge: language === "zh" ? "热销爆款" : language === "en" ? "Best Seller" : "Mais Vendido"
     },
     {
-      id: "prod-midi-plissado",
-      name: language === "zh" ? "Selianne 优雅杏色百褶显瘦连衣裙" : language === "en" ? "Selianne Apricot Pleated Slim Fit Midi Dress" : "Selianne Vestido Midi Plissado Evasê Damasco",
-      desc: language === "zh" ? "优雅圆领蝙蝠袖设计，立体风琴百褶裙摆，适合婚礼与宴会。" : language === "en" ? "Elegant round neck with batwing sleeves, structured pleated skirt, perfect for weddings and cocktails." : "Elegante vestido midi com pregas e mangas morcego, caimento slim fit confortável, perfeito para festas.",
-      image: vestidoMidiPlissado,
-      originalPrice: currency === "BRL" ? 160.00 : currency === "CNY" ? 220.00 : 30.00,
-      promoPrice: currency === "BRL" ? 107.78 : currency === "CNY" ? 149.00 : 20.00,
-      stockPercent: 96,
+      id: "prod-camisa-amarela",
+      name: language === "zh" ? "Camisa Brasil Nike I 2026/27 黄色球员版" : language === "en" ? "Brazil Nike Home 2026/27 Pro Jersey - Yellow" : "Camisa Oficial Seleção Brasileira Nike I 2026 - Amarela",
+      desc: language === "zh" ? "巴西队经典黄绿战袍，超薄透气面料，2026美加墨世界杯同款。" : language === "en" ? "Classic yellow and green Brazil kit, ultra-breathable tech fabric, 2026 World Cup edition." : "Clássico manto amarelo e verde da seleção, tecido Aero-FIT respirável, modelo jogador Pro da Copa 2026.",
+      image: camisaBrasilAmarela,
+      originalPrice: currency === "BRL" ? 399.90 : currency === "CNY" ? 499.00 : 75.00,
+      promoPrice: currency === "BRL" ? 49.90 : currency === "CNY" ? 65.00 : 9.50,
+      stockPercent: 97,
       itemsLeft: 2,
-      badge: language === "zh" ? "限量特惠" : language === "en" ? "Limited Edition" : "Lote Limitado"
+      badge: language === "zh" ? "热卖推荐" : language === "en" ? "Hot Seller" : "Campeão de Vendas"
     },
     {
-      id: "prod-midi-valentine",
-      name: language === "zh" ? "VALENTINE 泡泡袖英伦刺绣复古连衣裙" : language === "en" ? "Valentine Puff Sleeve Eyelet Embroidery Vintage Dress" : "Vestido Midi Valentine Bordado Inglês Vintage",
-      desc: language === "zh" ? "法式复古刺绣镂空花边，精致泡泡袖与单排扣点缀，温婉大方。" : language === "en" ? "French vintage eyelet embroidery, delicate puff sleeves, and front button details for a classic look." : "Mangas curtas bufantes, bordado inglês delicado, detalhes de botões frontais e barra evasê vintage.",
-      image: vestidoMidiValentine,
-      originalPrice: currency === "BRL" ? 199.00 : currency === "CNY" ? 270.00 : 38.00,
-      promoPrice: currency === "BRL" ? 139.50 : currency === "CNY" ? 189.00 : 26.00,
-      stockPercent: 88,
-      itemsLeft: 5,
-      badge: language === "zh" ? "新品推荐" : language === "en" ? "New Arrival" : "Lançamento VIP"
+      id: "prod-camisa-preta",
+      name: language === "zh" ? "Camisa Brasil Nike 黑色训练版 2026" : language === "en" ? "Brazil Nike 2026 Training Jersey - Black" : "Camisa Seleção Brasileira Treino 2026 - Preta",
+      desc: language === "zh" ? "全黑底色搭配醒目绿黄色点缀，训练系列首选，运动舒适。" : language === "en" ? "Sleek black base with vibrant yellow/green details, optimized for training comfort." : "Base preta com detalhes em verde e amarelo, tecido macio de alta performance e absorção de suor.",
+      image: camisaBrasilPreta,
+      originalPrice: currency === "BRL" ? 239.90 : currency === "CNY" ? 299.00 : 45.00,
+      promoPrice: currency === "BRL" ? 39.99 : currency === "CNY" ? 49.00 : 7.50,
+      stockPercent: 94,
+      itemsLeft: 4,
+      badge: language === "zh" ? "极速出货" : language === "en" ? "Super Value" : "Super Oferta"
     }
   ];
 
