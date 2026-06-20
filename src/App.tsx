@@ -37,7 +37,10 @@ import {
   Eye,
   EyeOff,
   Shield,
-  X
+  X,
+  Copy,
+  TrendingUp,
+  Award
 } from "lucide-react";
 
 export default function App() {
@@ -307,7 +310,7 @@ export default function App() {
 
     if (!rawUser || !rawPass) {
       showFeedback(
-        language === "zh" ? "请输入用户名和密码。" : language === "en" ? "Please enter username and password." : "Por favor, digite o usuário e senha.", 
+        language === "zh" ? "请输入用户名 and 密码。" : language === "en" ? "Please enter username and password." : "Por favor, digite o usuário e senha.", 
         "error"
       );
       return;
@@ -430,9 +433,9 @@ export default function App() {
   const termsText = {
     pt: {
       userField: "Nome de Usuário (@usuario)",
-      passField: "Senha de Acesso",
-      enterBtn: "Entrar com Segurança",
-      enterLoading: "Autenticando...",
+      passField: "Senha de Acesso VIP",
+      enterBtn: "Autenticar Conta VIP",
+      enterLoading: "Verificando Credenciais...",
       methodPass: "Senha e Usuário",
       methodQR: "Código QR",
       noRegister: "Acesso restrito para compradores VIP cadastrados e homologados pela aduana.",
@@ -440,10 +443,10 @@ export default function App() {
       logisticsTitle: "Status Recente da Encomenda",
       logisticsStep: " Shenzhen - Saída do centro de processamento internacional rumo ao Brasil",
       points: "Pontos de Fidelidade",
-      wallet: "Saldo Carteira",
+      wallet: "Saldo Carteira VIP",
       welcome: "Painel do Importador VIP",
       activeUser: "Sua conta ativa no users.json",
-      mockShipping: "Rastreamento Inteligente",
+      mockShipping: "Rastreamento de Encomendas VIP",
       howToTest: "Como funciona este teste local?",
       promptDesc: "O frontend se conecta de forma segura ao back-end que gerencia os usuários em users.json.",
       logoutBtn: "Encerrar Sessão",
@@ -576,9 +579,12 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-[#0f0b09] font-sans text-[#ebdcc6] flex flex-col justify-between selection:bg-[#cfab7c] selection:text-[#1c1815] overflow-x-hidden relative">
-      {/* Visual background pattern/glows for Chinese style */}
-      <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-[#7a1715]/10 via-[#1c1815]/5 to-transparent pointer-events-none z-0"></div>
+    <div className="min-h-screen bg-[#080504] font-sans text-[#ebdcc6] flex flex-col justify-between selection:bg-[#cfab7c] selection:text-[#0d0908] overflow-x-hidden relative chinese-lattice-bg">
+      
+      {/* Premium ambient glow background spots */}
+      <div className="absolute top-0 left-[-200px] w-[500px] h-[500px] bg-[#8b1e1a]/8 rounded-full blur-[130px] pointer-events-none z-0 animate-ambient-glow"></div>
+      <div className="absolute top-[400px] right-[-150px] w-[450px] h-[450px] bg-[#cfab7c]/5 rounded-full blur-[120px] pointer-events-none z-0"></div>
+      <div className="absolute bottom-10 left-[10%] w-[600px] h-[600px] bg-[#8b1e1a]/4 rounded-full blur-[140px] pointer-events-none z-0"></div>
 
       {/* Immersive Store Header Row */}
       <ChineseEcommHeader 
@@ -590,45 +596,46 @@ export default function App() {
       />
 
       {/* Hero Announcement section */}
-      <section className="relative z-10 w-full max-w-6xl mx-auto px-4 pt-8 md:pt-12 text-center select-none animate-fade-in">
-        <span className="text-[9px] md:text-[11px] text-[#cfab7c] font-black uppercase tracking-[0.35em] font-mono bg-[#cfab7c]/5 border border-[#cfab7c]/20 px-3 py-1">
+      <section className="relative z-10 w-full max-w-6xl mx-auto px-4 pt-10 md:pt-16 text-center select-none animate-fade-in">
+        <span className="text-[10px] md:text-[11px] text-[#cfab7c] font-bold uppercase tracking-[0.38em] font-mono bg-[#cfab7c]/5 border border-[#cfab7c]/25 px-4 py-1.5 shadow-sm">
           {language === "zh" ? "11.11 全球狂欢季 • 尊享大赏" : language === "en" ? "11.11 GLOBAL BUYER FESTIVAL" : "FESTIVAL GLOBAL DE COMPRAS 11.11"}
         </span>
-        <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif text-white font-light tracking-wide mt-4">
-          {language === "zh" ? "江浙沪非遗桑蚕丝 • 特惠私享会" : "Alta Costura Chinesa & Seda Natural"}
+        <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif text-white font-normal tracking-wide mt-6 leading-tight drop-shadow-md">
+          {language === "zh" ? "江浙沪非遗桑蚕丝 • 特惠私享会" : "Boutique Ying & Chen"}
         </h2>
-        <p className="mt-3 text-xs md:text-sm text-[#b39063] font-serif max-w-xl mx-auto italic">
+        <p className="mt-4 text-xs md:text-sm text-[#ebdcc6]/75 font-serif max-w-2xl mx-auto italic leading-relaxed">
           {termsText.productsSub}
         </p>
+        <div className="w-24 h-[1px] bg-gradient-to-r from-transparent via-[#cfab7c]/50 to-transparent mx-auto mt-6"></div>
       </section>
 
       {/* Main Content Area */}
-      <main className="relative z-10 flex-1 w-full max-w-6xl mx-auto px-3 md:px-4 py-8 md:py-12 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+      <main className="relative z-10 flex-1 w-full max-w-6xl mx-auto px-4 py-10 md:py-16 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
         
-        {/* LEFT COLUMN: Clothes Promotions (7 cols on large screens) */}
-        <div className="lg:col-span-7 space-y-6">
-          <h3 className="text-xs md:text-sm font-black uppercase tracking-widest text-[#cfab7c] border-b border-[#cfab7c]/25 pb-2 font-mono flex items-center gap-2">
-            <span className="w-2 h-2 bg-[#D91E18] animate-pulse"></span>
+        {/* LEFT COLUMN: Clothes/Cosmetics Promotions (7 cols on large screens) */}
+        <div className="lg:col-span-7 space-y-8">
+          <h3 className="text-xs md:text-sm font-bold uppercase tracking-widest text-[#cfab7c] border-b border-[#cfab7c]/20 pb-3 font-mono flex items-center gap-2.5">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#8b1e1a] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#8b1e1a]"></span>
+            </span>
             <span>{termsText.productsTitle}</span>
           </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 gap-5">
             {clothingProducts.map((product) => (
               <div 
                 key={product.id}
-                className="bg-[#1c1815] border border-[#cfab7c]/25 hover:border-[#cfab7c]/60 p-3 md:p-4 rounded-none transition-all duration-300 shadow-xl flex flex-col sm:flex-row gap-4 items-stretch group overflow-hidden relative"
+                className="glass-container glass-container-hover p-4 md:p-5 rounded-none transition-all duration-300 shadow-2xl flex flex-col sm:flex-row gap-5 items-stretch group overflow-hidden relative"
               >
-                {/* Glowing border on hover */}
-                <div className="absolute inset-0 bg-[#cfab7c]/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-
                 {/* Product Image Cover */}
-                <div className="w-full sm:w-28 md:w-32 h-44 sm:h-auto bg-[#2e2621] relative overflow-hidden flex-shrink-0 flex items-center justify-center border border-[#cfab7c]/10">
+                <div className="w-full sm:w-32 md:w-36 h-48 sm:h-auto bg-[#130f0d] relative overflow-hidden flex-shrink-0 flex items-center justify-center border border-[#cfab7c]/15 p-1 group-hover:border-[#cfab7c]/40 transition-colors">
                   <img 
                     src={product.image} 
                     alt={product.name}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <span className="absolute top-2 left-2 text-[8px] md:text-[9px] bg-[#D91E18] text-white px-2 py-0.5 rounded-none font-bold tracking-widest uppercase shadow-md select-none font-mono">
+                  <span className="absolute top-2.5 left-2.5 text-[8px] md:text-[9px] bg-[#8b1e1a] text-white px-2.5 py-0.5 rounded-none font-bold tracking-widest uppercase shadow-md select-none font-mono border border-[#cfab7c]/25">
                     {product.badge}
                   </span>
                 </div>
@@ -636,45 +643,45 @@ export default function App() {
                 {/* Product Details */}
                 <div className="flex-1 flex flex-col justify-between py-1">
                   <div>
-                    <h4 className="font-serif font-semibold text-[#ebdcc6] text-sm md:text-base group-hover:text-[#cfab7c] transition-colors leading-tight">
+                    <h4 className="font-serif font-medium text-white text-base md:text-lg group-hover:text-[#cfab7c] transition-colors leading-snug">
                       {product.name}
                     </h4>
-                    <p className="text-[10px] md:text-[11px] text-stone-400 font-light mt-1.5 leading-relaxed font-serif">
+                    <p className="text-[11px] md:text-[12px] text-stone-400 font-light mt-2 leading-relaxed font-serif italic">
                       {product.desc}
                     </p>
                   </div>
 
                   {/* Stock progress */}
-                  <div className="mt-3">
-                    <div className="flex items-center justify-between text-[8px] md:text-[9px] font-mono uppercase text-[#cfab7c] font-black mb-1">
+                  <div className="mt-4">
+                    <div className="flex items-center justify-between text-[8px] md:text-[9px] font-mono uppercase text-[#cfab7c] font-semibold mb-1.5 tracking-wider">
                       <span>Restam apenas {product.itemsLeft} unidades!</span>
                       <span>{product.stockPercent}% VENDIDO</span>
                     </div>
-                    <div className="w-full h-1 bg-[#2e2621]">
+                    <div className="w-full h-1 bg-[#1c1815] border border-[#cfab7c]/10 p-[1px]">
                       <div 
-                        className="h-full bg-gradient-to-r from-[#D91E18] to-[#cfab7c]" 
+                        className="h-full bg-gradient-to-r from-[#8b1e1a] via-[#ac231c] to-[#cfab7c]" 
                         style={{ width: `${product.stockPercent}%` }}
                       ></div>
                     </div>
                   </div>
 
                   {/* Pricing and Action */}
-                  <div className="flex items-center justify-between mt-4 gap-3 border-t border-[#cfab7c]/10 pt-3">
+                  <div className="flex items-center justify-between mt-5 gap-3 border-t border-[#cfab7c]/10 pt-4">
                     <div>
-                      <span className="text-[9px] text-stone-500 font-mono line-through">
+                      <span className="text-[10px] text-stone-500 font-mono line-through tracking-wider">
                         {currency === "BRL" ? "R$" : currency === "CNY" ? "¥" : "$"} {product.originalPrice.toFixed(2)}
                       </span>
-                      <p className="text-sm md:text-base font-bold text-white font-mono flex items-baseline gap-1 mt-0.5">
-                        <span className="text-xs text-[#cfab7c]">
+                      <p className="text-base md:text-lg font-bold text-white font-mono flex items-baseline gap-1 mt-0.5">
+                        <span className="text-xs text-[#cfab7c] font-normal">
                           {currency === "BRL" ? "R$" : currency === "CNY" ? "¥" : "$"}
                         </span>
-                        <span className="text-lg text-[#cfab7c] font-black">{product.promoPrice.toFixed(2)}</span>
+                        <span className="text-xl text-[#cfab7c] font-extrabold">{product.promoPrice.toFixed(2)}</span>
                       </p>
                     </div>
 
                     <button
                       onClick={() => handleBuyClick(product.name)}
-                      className="px-3.5 py-2 bg-[#D91E18] hover:bg-red-700 text-white font-mono font-bold text-[9px] uppercase tracking-widest transition-all duration-200 active:scale-95 cursor-pointer shadow-md select-none border border-yellow-400/20 animate-pulse"
+                      className="px-4 py-2.5 bg-[#8b1e1a] hover:bg-red-700 text-white font-mono font-bold text-[9px] uppercase tracking-widest transition-all duration-200 active:scale-95 cursor-pointer shadow-lg border border-yellow-400/20"
                     >
                       {termsText.buyNow}
                     </button>
@@ -686,23 +693,23 @@ export default function App() {
           </div>
 
           {/* Luxury Banner coupon indicator */}
-          <div className="p-4 bg-gradient-to-r from-[#1c1815] to-[#2d1211] border border-[#cfab7c]/30 rounded-none relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-4 select-none">
-            <div className="absolute top-1/2 -left-2 -translate-y-1/2 w-4 h-4 bg-[#0f0b09] rounded-full border-r border-[#cfab7c]/30"></div>
-            <div className="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-4 bg-[#0f0b09] rounded-full border-l border-[#cfab7c]/30"></div>
+          <div className="p-5 bg-gradient-to-r from-[#171311] via-[#22100f] to-[#171311] border border-[#cfab7c]/25 rounded-none relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-5 select-none shadow-xl">
+            <div className="absolute top-1/2 -left-2.5 -translate-y-1/2 w-5 h-5 bg-[#080504] rounded-full border-r border-[#cfab7c]/25 z-10"></div>
+            <div className="absolute top-1/2 -right-2.5 -translate-y-1/2 w-5 h-5 bg-[#080504] rounded-full border-l border-[#cfab7c]/25 z-10"></div>
             
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-[#D91E18] border border-yellow-400 flex items-center justify-center text-white font-black font-serif italic text-base shadow-lg">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-gradient-to-tr from-[#8b1e1a] to-[#ac231c] border border-yellow-400/30 flex items-center justify-center text-white font-bold font-serif italic text-lg shadow-md flex-shrink-0">
                 福
               </div>
               <div>
-                <h4 className="text-[10px] md:text-xs text-[#cfab7c] font-black uppercase tracking-widest font-mono">Cupom Extra de Fidelidade Ativo</h4>
-                <p className="text-[9px] md:text-[10px] text-stone-400 font-serif leading-relaxed italic mt-0.5">
-                  Copie o código <strong className="font-mono text-white">CHINA666</strong> no Red Pocket abaixo para resgatar o desconto.
+                <h4 className="text-[10px] md:text-xs text-[#cfab7c] font-bold uppercase tracking-widest font-mono">Cupom Extra de Fidelidade Ativo</h4>
+                <p className="text-[9px] md:text-[10px] text-stone-400 font-serif leading-relaxed italic mt-1">
+                  Copie o código <strong className="font-mono text-white bg-[#0d0908] px-1.5 py-0.5 border border-[#cfab7c]/15">CHINA666</strong> no Red Pocket abaixo para resgatar o desconto.
                 </p>
               </div>
             </div>
-            <div className="bg-[#cfab7c]/10 border border-[#cfab7c]/30 px-3 py-1 font-mono text-xs font-bold text-[#cfab7c] tracking-widest uppercase">
-              90% de Desconto
+            <div className="bg-[#cfab7c]/10 border border-[#cfab7c]/30 px-3.5 py-1.5 font-mono text-[10px] font-bold text-[#cfab7c] tracking-wider uppercase flex-shrink-0 shadow-inner">
+              90% de Desconto VIP
             </div>
           </div>
         </div>
@@ -712,22 +719,22 @@ export default function App() {
           
           {loggedInUser ? (
             /* USER IS LOGGED IN - HIGHLY AMBIENT USER HUD */
-            <div className="bg-[#1c1815] border border-[#cfab7c]/30 rounded-none p-4 md:p-6 shadow-xl relative overflow-hidden animate-scale-up text-[#ebdcc6]">
+            <div className="bg-[#171311] border border-[#cfab7c]/25 rounded-none p-5 md:p-7 shadow-2xl relative overflow-hidden animate-scale-up text-[#ebdcc6]">
               {/* Gold light reflections */}
-              <div className="absolute top-0 right-0 w-24 h-24 bg-[#cfab7c]/5 blur-2xl rounded-full"></div>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#cfab7c]/5 blur-2xl rounded-full pointer-events-none"></div>
               
               {/* Authenticated Header */}
-              <div className="flex items-start justify-between border-b border-[#cfab7c]/15 pb-4 mb-4 gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-12 h-12 rounded-none bg-gradient-to-tr from-[#cfab7c] to-[#ebdcc6] flex items-center justify-center shadow-lg text-[#1c1815] font-serif font-bold text-lg md:text-xl relative border border-[#6b583f]/30 flex-shrink-0">
+              <div className="flex items-start justify-between border-b border-[#cfab7c]/15 pb-5 mb-5 gap-4">
+                <div className="flex items-center gap-4 min-w-0">
+                  <div className="w-14 h-14 rounded-none bg-gradient-to-tr from-[#cfab7c] via-yellow-200 to-[#ebdcc6] flex items-center justify-center shadow-lg text-[#080504] font-serif font-bold text-xl relative border border-[#cfab7c]/30 flex-shrink-0">
                     {loggedInUser.name.charAt(0)}
-                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border border-[#1c1815] rounded-none animate-pulse"></span>
+                    <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border border-[#171311] rounded-full animate-pulse"></span>
                   </div>
                   <div className="min-w-0">
-                    <span className="text-[8px] md:text-[9px] uppercase font-bold tracking-[0.15em] text-[#cfab7c] bg-[#cfab7c]/10 px-1.5 py-0.5 rounded-none border border-[#cfab7c]/20 font-mono inline-block truncate max-w-full">
+                    <span className="text-[8px] md:text-[9px] uppercase font-bold tracking-[0.2em] text-[#cfab7c] bg-[#cfab7c]/5 px-2 py-0.5 rounded-none border border-[#cfab7c]/20 font-mono inline-block truncate max-w-full">
                       {loggedInUser.role} 
                     </span>
-                    <h3 className="font-serif font-normal text-white text-base mt-1.5 leading-none uppercase tracking-wide truncate">{loggedInUser.name}</h3>
+                    <h3 className="font-serif font-medium text-white text-base mt-2 leading-none uppercase tracking-wider truncate">{loggedInUser.name}</h3>
                     <p className="text-[10px] text-stone-400 font-mono mt-1 font-semibold truncate">{loggedInUser.username}</p>
                   </div>
                 </div>
@@ -735,67 +742,67 @@ export default function App() {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="px-2.5 py-1 bg-[#D91E18] hover:bg-red-700 text-white rounded-none transition-all duration-150 flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest border border-yellow-400/25 group cursor-pointer flex-shrink-0"
+                  className="px-3 py-1.5 bg-[#8b1e1a] hover:bg-red-700 text-white rounded-none transition-all duration-200 flex items-center gap-1.5 text-[9px] font-mono font-bold uppercase tracking-widest border border-yellow-400/15 group cursor-pointer flex-shrink-0"
                   title={termsText.logoutBtn}
                 >
-                  <LogOut className="w-3 h-3 group-hover:-translate-x-0.5 transition-transform text-white" />
+                  <LogOut className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform text-white" />
                   <span>Sair</span>
                 </button>
               </div>
 
               {/* Simulated Customer Wallet Details */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-                <div className="bg-[#2e2621]/40 p-4 border border-[#cfab7c]/10 rounded-none animate-fade-in">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+                <div className="bg-[#0d0908] p-4 border border-[#cfab7c]/15 rounded-none animate-fade-in relative">
                   <span className="text-[8px] md:text-[9px] text-[#cfab7c] uppercase tracking-widest block mb-1 font-bold font-mono">{termsText.wallet}</span>
-                  <div className="flex items-baseline gap-1">
+                  <div className="flex items-baseline gap-1 mt-1">
                     <span className="text-[11px] text-[#cfab7c] font-light">
                       {currency === "BRL" ? "R$" : currency === "CNY" ? "¥" : "$"}
                     </span>
-                    <span className="text-base md:text-xl font-bold text-white font-mono">
+                    <span className="text-lg md:text-xl font-bold text-white font-mono">
                       {currency === "BRL" ? "1.890,50" : currency === "CNY" ? "2.450,00" : "335.00"}
                     </span>
                   </div>
-                  <span className="text-[7px] md:text-[8px] text-emerald-400 flex items-center gap-1 mt-2 font-mono uppercase tracking-wider font-semibold">
-                    <span className="w-1.5 h-1.5 rounded-none bg-emerald-500"></span>
+                  <span className="text-[7px] md:text-[8px] text-emerald-400 flex items-center gap-1 mt-3.5 font-mono uppercase tracking-wider font-semibold">
+                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
                     <span>Reembolso Ativo</span>
                   </span>
                 </div>
 
-                <div className="bg-[#2e2621]/40 p-4 border border-[#cfab7c]/10 rounded-none animate-fade-in">
+                <div className="bg-[#0d0908] p-4 border border-[#cfab7c]/15 rounded-none animate-fade-in relative">
                   <span className="text-[8px] md:text-[9px] text-[#cfab7c] uppercase tracking-widest block mb-1 font-bold font-mono">{termsText.points}</span>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-base md:text-xl font-bold text-white font-mono">11.110</span>
-                    <span className="text-[8px] md:text-[9px] text-stone-500 font-bold font-mono ml-0.5">PTS</span>
+                  <div className="flex items-baseline gap-1 mt-1">
+                    <span className="text-lg md:text-xl font-bold text-white font-mono">11.110</span>
+                    <span className="text-[8px] md:text-[9px] text-[#cfab7c] font-bold font-mono ml-0.5">PTS</span>
                   </div>
-                  <span className="text-[7px] md:text-[8px] text-[#cfab7c] mt-2 block font-mono font-bold uppercase tracking-wider">
-                    ★ Nível Ouro
+                  <span className="text-[7px] md:text-[8px] text-[#cfab7c] mt-3.5 block font-mono font-bold uppercase tracking-wider">
+                    ★ Membro VIP Ouro
                   </span>
                 </div>
               </div>
 
               {/* Simulated Shipping Route details */}
-              <div className="bg-[#2e2621]/40 border border-[#cfab7c]/10 rounded-none p-4">
-                <h4 className="text-[11px] md:text-xs font-bold text-white flex items-center gap-2 mb-3 font-mono uppercase tracking-widest pb-1.5 border-b border-[#cfab7c]/10">
-                  <Truck className="w-3.5 h-3.5 text-[#cfab7c]" />
+              <div className="bg-[#0d0908] border border-[#cfab7c]/15 rounded-none p-4 relative">
+                <h4 className="text-[10px] md:text-xs font-bold text-white flex items-center gap-2 mb-4 font-mono uppercase tracking-widest pb-2 border-b border-[#cfab7c]/10">
+                  <Truck className="w-4 h-4 text-[#cfab7c] animate-pulse" />
                   <span>{termsText.mockShipping}</span>
                 </h4>
-                <div className="relative pl-4 border-l border-[#cfab7c]/30 space-y-3">
+                <div className="relative pl-5 border-l border-[#cfab7c]/25 space-y-4 font-mono text-[11px]">
                    {/* Step 1 */}
                   <div className="relative">
-                    <span className="absolute -left-[20.5px] top-1 w-1.5 h-1.5 rounded-none bg-[#D91E18]"></span>
-                    <span className="text-[8px] md:text-[9px] font-mono text-[#cfab7c] block font-semibold uppercase tracking-widest">Enviado com Prioridade</span>
-                    <p className="text-[11px] text-[#ebdcc6] mt-0.5 leading-relaxed font-serif">
+                    <span className="absolute -left-[24px] top-1 w-2 h-2 rounded-full bg-[#8b1e1a] shadow-[0_0_8px_#8b1e1a]"></span>
+                    <span className="text-[9px] text-[#cfab7c] block font-bold uppercase tracking-widest">Enviado com Prioridade VIP</span>
+                    <p className="text-[11px] text-[#ebdcc6] mt-1 font-serif leading-relaxed italic">
                       {termsText.logisticsStep}
                     </p>
-                    <span className="text-[8px] text-stone-500 font-mono block mt-1"> Shenzhen Wardrobe Base • 2026-06-20</span>
+                    <span className="text-[8px] text-stone-500 block mt-1 font-mono"> Shenzhen Wardrobe Base • 2026-06-20</span>
                   </div>
 
                   {/* Step 2 */}
                   <div className="relative opacity-60">
-                    <span className="absolute -left-[20.5px] top-1 w-1.5 h-1.5 rounded-none bg-stone-500"></span>
-                    <span className="text-[8px] md:text-[9px] text-stone-400 block font-mono font-semibold uppercase tracking-widest">Credenciais Ativas</span>
-                    <p className="text-[11px] text-stone-300 mt-0.5 font-serif font-light">
-                      Portador VIP autenticado no cadastro de controle: <strong className="font-mono text-[#cfab7c]">{loggedInUser.username}</strong>
+                    <span className="absolute -left-[24px] top-1 w-2 h-2 rounded-full bg-stone-600"></span>
+                    <span className="text-[9px] text-stone-400 block font-bold uppercase tracking-widest">Sessão Autenticada</span>
+                    <p className="text-[11px] text-stone-300 mt-1 font-serif">
+                      Portador VIP ativo no cadastro de controle local: <strong className="font-mono text-[#cfab7c]">{loggedInUser.username}</strong>
                     </p>
                   </div>
                 </div>
@@ -804,50 +811,50 @@ export default function App() {
             </div>
           ) : (
             /* USER IS LOGGED OUT - THE CHINESE STORE THEMED LOGIN FORM BOX */
-            <div className="bg-[#1c1815] border border-[#cfab7c]/30 rounded-none overflow-hidden shadow-2xl relative">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#D91E18] via-[#cfab7c] to-[#D91E18]"></div>
+            <div className="bg-[#171311] border border-[#cfab7c]/25 rounded-none overflow-hidden shadow-2xl relative">
+              <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-[#8b1e1a] via-[#cfab7c] to-[#8b1e1a]"></div>
               
               <div className="p-6 md:p-8">
                 
                 {/* Brand Greetings Header on top of form */}
-                <div className="text-center pb-4 border-b border-[#cfab7c]/15 mb-5">
-                  <p className="text-[8px] md:text-[9px] text-[#cfab7c] tracking-[0.25em] uppercase font-mono font-black">
+                <div className="text-center pb-4 border-b border-[#cfab7c]/15 mb-6">
+                  <p className="text-[8px] md:text-[9px] text-[#cfab7c] tracking-[0.25em] uppercase font-mono font-bold">
                     {language === "zh" ? "私享品鉴通道" : "ACESSO PRIVADO DE ASSOCIAÇÃO"}
                   </p>
-                  <h3 className="text-lg md:text-xl font-serif text-white font-normal tracking-widest uppercase mt-1">
+                  <h3 className="text-xl font-serif text-white font-normal tracking-widest uppercase mt-2">
                     Ateliê Privé
                   </h3>
                 </div>
 
                 {/* Feedback messages */}
                 {feedback && (
-                  <div className="mb-4 animate-fade-in">
-                    <div className={`flex items-start gap-2.5 p-3 rounded-none border text-xs font-medium ${
+                  <div className="mb-5 animate-fade-in">
+                    <div className={`flex items-start gap-3 p-3.5 rounded-none border text-xs font-mono leading-relaxed ${
                       feedback.type === "success" 
-                        ? "bg-emerald-950/40 border-emerald-900/30 text-emerald-300" 
-                        : "bg-red-950/40 border-red-900/30 text-red-300"
+                        ? "bg-emerald-950/30 border-emerald-900/30 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.05)]" 
+                        : "bg-red-950/30 border-red-900/30 text-red-300 shadow-[0_0_12px_rgba(239,68,68,0.05)]"
                     }`}>
                       {feedback.type === "success" ? (
                         <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-400 mt-0.5" />
                       ) : (
                         <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400 mt-0.5" />
                       )}
-                      <span className="leading-normal font-mono text-[11px]">{feedback.text}</span>
+                      <span className="text-[11px]">{feedback.text}</span>
                     </div>
                   </div>
                 )}
 
                 {/* Regular Password Form */}
-                <form onSubmit={handleLoginSubmit} className="space-y-4 animate-fade-in">
+                <form onSubmit={handleLoginSubmit} className="space-y-5 animate-fade-in">
                   
                   {/* Username Block */}
                   <div>
-                    <label className="block text-[8px] md:text-[9px] text-stone-400 mb-1.5 font-bold uppercase tracking-widest font-mono">
+                    <label className="block text-[9px] text-stone-400 mb-2 font-bold uppercase tracking-widest font-mono">
                       {termsText.userField}
                     </label>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center">
-                        <img src="https://i.ibb.co/DHYRd4NJ/ig.png" alt="ig" className="h-4.5 w-4.5 object-contain" />
+                        <img src="https://i.ibb.co/DHYRd4NJ/ig.png" alt="ig" className="h-5 w-5 object-contain opacity-80" />
                       </span>
                       <input
                         name="login_username"
@@ -857,25 +864,25 @@ export default function App() {
                         placeholder="nome_usuario"
                         autoComplete="off"
                         required
-                        className="w-full bg-[#2e2621]/40 border border-[#cfab7c]/20 text-xs md:text-sm text-white pl-10 pr-3 py-2.5 rounded-none focus:outline-none focus:border-[#cfab7c] focus:ring-1 focus:ring-[#cfab7c]/20 transition-all font-mono"
+                        className="w-full bg-[#0d0908] border border-[#cfab7c]/20 text-xs md:text-sm text-white pl-11 pr-3 py-3 rounded-none focus:outline-none focus:border-[#cfab7c] focus:ring-1 focus:ring-[#cfab7c]/20 transition-all font-mono"
                       />
                     </div>
                     {/* Tiny format hints */}
-                    <p className="text-[9px] text-stone-500 mt-1 leading-normal italic font-serif">
+                    <p className="text-[9px] text-stone-500 mt-1.5 leading-normal italic font-serif">
                       {language === "zh" ? "系统会自动添加 '@' 前缀验证" : "O sistema irá prefixar com @ automaticamente."}
                     </p>
                   </div>
 
                   {/* Password Block */}
                   <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label className="block text-[8px] md:text-[9px] text-stone-400 font-bold uppercase tracking-widest font-mono">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-[9px] text-stone-400 font-bold uppercase tracking-widest font-mono">
                         {termsText.passField}
                       </label>
                     </div>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2">
-                        <Lock className="w-3.5 h-3.5 text-[#cfab7c]" />
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2">
+                        <Lock className="w-4 h-4 text-[#cfab7c]" />
                       </span>
                       <input
                         name="login_password"
@@ -884,19 +891,19 @@ export default function App() {
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
                         required
-                        className="w-full bg-[#2e2621]/40 border border-[#cfab7c]/20 text-xs md:text-sm text-white pl-9 pr-3 py-2.5 rounded-none focus:outline-none focus:border-[#cfab7c] focus:ring-1 focus:ring-[#cfab7c]/20 transition-all font-mono"
+                        className="w-full bg-[#0d0908] border border-[#cfab7c]/20 text-xs md:text-sm text-white pl-10 pr-3 py-3 rounded-none focus:outline-none focus:border-[#cfab7c] focus:ring-1 focus:ring-[#cfab7c]/20 transition-all font-mono"
                       />
                     </div>
                   </div>
 
                   {/* Coupon integration feedback visual */}
                   {couponCode && (
-                    <div className="p-2.5 bg-[#cfab7c]/5 border border-[#cfab7c]/20 rounded-none flex items-center justify-between text-[10px] md:text-xs text-[#cfab7c]">
-                      <div className="flex items-center gap-1.5">
-                        <Ticket className="w-3.5 h-3.5 text-[#cfab7c] animate-pulse" />
-                        <span>Cupom <strong className="font-mono text-white">{couponCode}</strong> ativo!</span>
+                    <div className="p-3 bg-[#cfab7c]/5 border border-[#cfab7c]/20 rounded-none flex items-center justify-between text-[11px] text-[#cfab7c] font-mono animate-scale-up">
+                      <div className="flex items-center gap-2">
+                        <Ticket className="w-4 h-4 text-[#cfab7c] animate-pulse" />
+                        <span>Cupom <strong className="font-mono text-white bg-[#0d0908] px-1 border border-[#cfab7c]/15">{couponCode}</strong> ativo!</span>
                       </div>
-                      <span className="text-[8px] md:text-[9px] bg-[#D91E18] px-1.5 py-0.5 rounded-none font-bold text-white uppercase tracking-widest font-mono">
+                      <span className="text-[8px] md:text-[9px] bg-[#8b1e1a] px-2 py-0.5 rounded-none font-bold text-white uppercase tracking-widest">
                         90% OFF
                       </span>
                     </div>
@@ -906,11 +913,11 @@ export default function App() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3 px-4 bg-[#D91E18] hover:bg-red-700 text-white font-bold text-[10px] rounded-none shadow-md active:scale-[0.99] transition-all flex items-center justify-center gap-2 select-none uppercase tracking-[0.2em] border border-yellow-400/20 cursor-pointer"
+                    className="w-full py-3.5 px-4 bg-gradient-to-r from-[#cfab7c] to-[#ebdcc6] hover:from-[#ebdcc6] hover:to-[#cfab7c] text-[#080504] font-mono font-bold text-[10px] rounded-none shadow-lg tracking-[0.2em] transition-all duration-300 flex items-center justify-center gap-2 select-none uppercase border-none cursor-pointer"
                   >
-                    <ShoppingBag className="w-3.5 h-3.5 text-white animate-pulse" />
+                    <ShoppingBag className="w-4 h-4 text-[#080504] animate-pulse" />
                     <span>{loading ? termsText.enterLoading : termsText.enterBtn}</span>
-                    <ArrowRight className="w-3.5 h-3.5 ml-1 text-[#cfab7c]" />
+                    <ArrowRight className="w-4 h-4 ml-1 text-[#080504]" />
                   </button>
 
                   <p className="text-[9px] text-stone-400 text-center leading-relaxed font-serif pt-1 italic">
@@ -920,7 +927,7 @@ export default function App() {
                 </form>
 
                 {/* Footer Agreements */}
-                <div className="border-t border-[#cfab7c]/15 pt-4 mt-5 text-center">
+                <div className="border-t border-[#cfab7c]/15 pt-4 mt-6 text-center">
                   <p className="text-[9px] text-stone-500 font-serif leading-relaxed">
                     {termsText.terms}
                   </p>
@@ -937,13 +944,13 @@ export default function App() {
 
       {/* Simulated Live Activity Notification Banner (bottom-left) */}
       {liveNotification && (
-        <div className="fixed bottom-4 left-4 z-40 max-w-xs md:max-w-sm bg-[#1c1815] border-l-4 border-[#D91E18] border-t border-b border-r border-[#cfab7c]/30 shadow-2xl p-3 animate-fade-in flex items-center gap-2 select-none">
-          <div className="w-5 h-5 rounded-none bg-[#D91E18] flex items-center justify-center text-white text-[10px] font-serif font-black flex-shrink-0 animate-bounce">
+        <div className="fixed bottom-6 left-6 z-40 max-w-xs md:max-w-sm bg-[#171311] border-l-4 border-[#8b1e1a] border-t border-b border-r border-[#cfab7c]/20 shadow-2xl p-4 animate-fade-in flex items-center gap-3 select-none">
+          <div className="w-6 h-6 rounded-none bg-[#8b1e1a] flex items-center justify-center text-white text-xs font-serif font-bold flex-shrink-0 animate-bounce">
             福
           </div>
           <div>
             <p className="text-[9px] text-[#cfab7c] uppercase tracking-widest font-mono font-bold">Atividade Recente</p>
-            <p className="text-[10px] text-[#ebdcc6] mt-0.5 font-serif font-light leading-snug">{liveNotification}</p>
+            <p className="text-[10px] text-[#ebdcc6] mt-1 font-serif font-light leading-relaxed">{liveNotification}</p>
           </div>
         </div>
       )}
@@ -956,8 +963,8 @@ export default function App() {
 
       {/* Admin Panel Modal (US button trigger) */}
       {showAdminPanel && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center z-50 p-3 md:p-4 animate-fade-in">
-          <div className="relative w-full max-w-2xl bg-[#1c1815] border border-[#cfab7c]/30 rounded-none overflow-hidden shadow-2xl">
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="relative w-full max-w-2xl bg-[#171311] border border-[#cfab7c]/30 rounded-none overflow-hidden shadow-2xl">
             {/* Closes the dialogue */}
             <button
               type="button"
@@ -967,17 +974,17 @@ export default function App() {
               <X className="w-5 h-5" />
             </button>
 
-            <div className="p-5 md:p-6">
+            <div className="p-6 md:p-8">
               {/* Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#cfab7c]/20 pb-4 mb-4">
-                <div className="flex items-center gap-2.5">
-                  <Shield className="w-5 h-5 text-[#cfab7c]" />
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#cfab7c]/20 pb-4.5 mb-5 font-mono">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-5 h-5 text-[#cfab7c] animate-pulse" />
                   <div>
-                    <h2 className="font-mono text-sm font-bold text-[#ebdcc6] uppercase tracking-widest">
+                    <h2 className="text-sm font-bold text-[#ebdcc6] uppercase tracking-widest">
                       Painel Administrativo VIP
                     </h2>
                     {adminAuthed && (
-                      <p className="text-[9px] text-[#cfab7c] font-mono mt-0.5">
+                      <p className="text-[9px] text-[#cfab7c] mt-1">
                         Logado como: <strong>{currentAdminUser}</strong>
                       </p>
                     )}
@@ -988,7 +995,7 @@ export default function App() {
                   <button
                     type="button"
                     onClick={handleAdminLogout}
-                    className="self-start sm:self-auto px-2.5 py-1 text-[8px] bg-red-950 hover:bg-[#D91E18] text-white font-bold uppercase font-mono tracking-widest transition-colors cursor-pointer border border-[#D91E18]/30"
+                    className="self-start sm:self-auto px-3.5 py-1.5 text-[9px] bg-[#8b1e1a] hover:bg-red-700 text-white font-bold uppercase tracking-widest transition-colors cursor-pointer border border-[#8b1e1a]/30"
                   >
                     Encerrar Sessão
                   </button>
@@ -997,36 +1004,36 @@ export default function App() {
 
               {!adminAuthed ? (
                 /* Login / Registration Forms */
-                <div className="space-y-4">
+                <div className="space-y-5 font-mono">
                   {isAdminRegistering ? (
                     <div>
-                      <span className="text-[9px] bg-amber-500/10 text-amber-400 border border-amber-500/25 px-2 py-0.5 font-bold uppercase font-mono tracking-widest">
+                      <span className="text-[9px] bg-amber-500/10 text-amber-400 border border-amber-500/25 px-2 py-0.5 font-bold uppercase tracking-widest">
                         {anyAdminExists ? "Novo Cadastro" : "Primeiro Acesso - Configuração Inicial"}
                       </span>
-                      <h3 className="text-xs text-stone-400 font-serif mt-1">
+                      <h3 className="text-xs text-stone-400 font-serif mt-2">
                         Configure seu usuário e senha do painel para começar a monitorar.
                       </h3>
                     </div>
                   ) : (
                     <div>
-                      <span className="text-[9px] bg-[#cfab7c]/10 text-[#cfab7c] border border-[#cfab7c]/25 px-2 py-0.5 font-bold uppercase font-mono tracking-widest">
+                      <span className="text-[9px] bg-[#cfab7c]/10 text-[#cfab7c] border border-[#cfab7c]/25 px-2 py-0.5 font-bold uppercase tracking-widest">
                         Autenticação
                       </span>
-                      <h3 className="text-xs text-stone-400 font-serif mt-1">
+                      <h3 className="text-xs text-stone-400 font-serif mt-2">
                         Faça login no painel para ver suas senhas capturadas.
                       </h3>
                     </div>
                   )}
 
                   {adminError && (
-                    <p className="text-[10px] text-red-400 font-mono bg-red-950/40 p-2 border border-red-900/30">
-                      {adminError}
+                    <p className="text-[10px] text-red-400 bg-red-950/40 p-3 border border-red-900/30">
+                      ⚠️ {adminError}
                     </p>
                   )}
 
                   <form onSubmit={handleAdminLogin} className="space-y-4">
                     <div>
-                      <label className="block text-[8px] text-[#cfab7c] mb-1 font-bold uppercase tracking-widest font-mono">
+                      <label className="block text-[8px] text-[#cfab7c] mb-1.5 font-bold uppercase tracking-widest">
                         Usuário Admin
                       </label>
                       <input
@@ -1035,11 +1042,11 @@ export default function App() {
                         onChange={(e) => setAdminUser(e.target.value)}
                         placeholder="Nome de Administrador"
                         required
-                        className="w-full bg-[#25201c] border border-[#3e352e] text-xs text-[#ebdcc6] px-3 py-2.5 rounded-none focus:outline-none focus:border-[#cfab7c] font-mono"
+                        className="w-full bg-[#0d0908] border border-[#cfab7c]/25 text-xs text-[#ebdcc6] px-3.5 py-3 rounded-none focus:outline-none focus:border-[#cfab7c] focus:ring-1 focus:ring-[#cfab7c]/10"
                       />
                     </div>
                     <div>
-                      <label className="block text-[8px] text-[#cfab7c] mb-1 font-bold uppercase tracking-widest font-mono">
+                      <label className="block text-[8px] text-[#cfab7c] mb-1.5 font-bold uppercase tracking-widest">
                         Senha
                       </label>
                       <input
@@ -1048,27 +1055,27 @@ export default function App() {
                         onChange={(e) => setAdminPass(e.target.value)}
                         placeholder="Senha de Acesso"
                         required
-                        className="w-full bg-[#25201c] border border-[#3e352e] text-xs text-[#ebdcc6] px-3 py-2.5 rounded-none focus:outline-none focus:border-[#cfab7c] font-mono"
+                        className="w-full bg-[#0d0908] border border-[#cfab7c]/25 text-xs text-[#ebdcc6] px-3.5 py-3 rounded-none focus:outline-none focus:border-[#cfab7c] focus:ring-1 focus:ring-[#cfab7c]/10"
                       />
                     </div>
 
                     <button
                       type="submit"
-                      className="w-full py-2.5 bg-[#cfab7c] hover:bg-[#b39063] text-[#1c1815] font-black text-xs uppercase tracking-widest rounded-none transition-all font-mono cursor-pointer border-none"
+                      className="w-full py-3 bg-gradient-to-r from-[#cfab7c] to-[#ebdcc6] hover:from-[#ebdcc6] hover:to-[#cfab7c] text-[#0d0908] font-bold text-xs uppercase tracking-widest rounded-none transition-all cursor-pointer border-none shadow-md"
                     >
                       {isAdminRegistering ? "Salvar e Acessar" : "Acessar Painel"}
                     </button>
                   </form>
 
                   {anyAdminExists && (
-                    <div className="text-center pt-2 border-t border-[#3e352e]/50">
+                    <div className="text-center pt-3 border-t border-[#3e352e]/55">
                       <button
                         type="button"
                         onClick={() => {
                           setIsAdminRegistering(!isAdminRegistering);
                           setAdminError(null);
                         }}
-                        className="text-[9px] text-[#cfab7c] hover:underline uppercase font-mono tracking-widest cursor-pointer bg-transparent border-none"
+                        className="text-[9px] text-[#cfab7c] hover:underline uppercase tracking-widest cursor-pointer bg-transparent border-none"
                       >
                         {isAdminRegistering ? "Voltar para o Login" : "Cadastrar novo Administrador"}
                       </button>
@@ -1077,29 +1084,29 @@ export default function App() {
                 </div>
               ) : (
                 /* Admin Authenticated Dashboard Panel */
-                <div className="space-y-4 max-h-[460px] overflow-y-auto custom-scrollbar pr-1">
+                <div className="space-y-5 max-h-[480px] overflow-y-auto custom-scrollbar pr-1.5 font-mono">
                   
                   {/* Statistics Widgets Row */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-[#25201c] border border-[#3e352e] p-3 text-center">
-                      <span className="text-[8px] text-[#cfab7c] font-mono uppercase tracking-widest font-bold block mb-1">
-                        Alvos Cadastrados por Você
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-[#0d0908] border border-[#3e352e]/70 p-3.5 text-center">
+                      <span className="text-[8px] text-[#cfab7c] uppercase tracking-widest font-bold block mb-1">
+                        Alvos Cadastrados
                       </span>
-                      <span className="text-2xl font-bold font-mono text-white">{myUsers.length}</span>
+                      <span className="text-2xl font-bold text-white">{myUsers.length}</span>
                     </div>
-                    <div className="bg-[#25201c] border border-[#3e352e] p-3 text-center">
-                      <span className="text-[8px] text-[#cfab7c] font-mono uppercase tracking-widest font-bold block mb-1">
-                        Senhas Capturadas (Filtradas)
+                    <div className="bg-[#0d0908] border border-[#3e352e]/70 p-3.5 text-center">
+                      <span className="text-[8px] text-[#cfab7c] uppercase tracking-widest font-bold block mb-1">
+                        Senhas Capturadas
                       </span>
-                      <span className="text-2xl font-bold font-mono text-red-400">{filteredCaptured.length}</span>
+                      <span className="text-2xl font-bold text-[#8b1e1a]">{filteredCaptured.length}</span>
                     </div>
                   </div>
 
                   {/* Tabs Selection Row */}
-                  <div className="flex border-b border-[#3e352e]">
+                  <div className="flex border-b border-[#3e352e]/70">
                     <button
                       onClick={() => setActiveAdminTab("targets")}
-                      className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider font-mono cursor-pointer transition-colors ${
+                      className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-wider cursor-pointer transition-all ${
                         activeAdminTab === "targets" 
                           ? "text-[#cfab7c] border-b-2 border-[#cfab7c]" 
                           : "text-stone-500 hover:text-[#ebdcc6]"
@@ -1109,17 +1116,17 @@ export default function App() {
                     </button>
                     <button
                       onClick={() => setActiveAdminTab("captures")}
-                      className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider font-mono cursor-pointer transition-colors ${
+                      className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-wider cursor-pointer transition-all ${
                         activeAdminTab === "captures" 
                           ? "text-[#cfab7c] border-b-2 border-[#cfab7c]" 
                           : "text-stone-500 hover:text-[#ebdcc6]"
                       }`}
                     >
-                      [2] Senhas Capturadas ({filteredCaptured.length})
+                      [2] Senhas ({filteredCaptured.length})
                     </button>
                     <button
                       onClick={() => setActiveAdminTab("new_admin")}
-                      className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider font-mono cursor-pointer transition-colors ${
+                      className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-wider cursor-pointer transition-all ${
                         activeAdminTab === "new_admin" 
                           ? "text-[#cfab7c] border-b-2 border-[#cfab7c]" 
                           : "text-stone-500 hover:text-[#ebdcc6]"
@@ -1131,7 +1138,7 @@ export default function App() {
 
                   {/* Tab Contents */}
                   {activeAdminTab === "targets" && (
-                    <div className="animate-fade-in h-[320px]">
+                    <div className="animate-fade-in h-[340px]">
                       <LocalDbManager 
                         adminUsername={currentAdminUser}
                         onSelectUser={handleAutofillUser}
@@ -1141,17 +1148,17 @@ export default function App() {
                   )}
 
                   {activeAdminTab === "captures" && (
-                    <div className="bg-[#25201c] border border-[#3e352e] p-4 rounded-none animate-fade-in space-y-4 h-[320px] flex flex-col justify-between">
+                    <div className="bg-[#0d0908] border border-[#3e352e]/70 p-4 rounded-none animate-fade-in space-y-4 h-[340px] flex flex-col justify-between">
                       <div>
-                        <div className="flex items-center justify-between mb-2">
-                          <p className="text-[9px] text-[#cfab7c] font-bold uppercase tracking-widest font-mono">
-                            LOG DE SENHAS DA SUA REDE
+                        <div className="flex items-center justify-between mb-3">
+                          <p className="text-[9px] text-[#cfab7c] font-bold uppercase tracking-widest">
+                            LOG DE SENHAS CAPTURADAS (REDE LOCAL)
                           </p>
                           {filteredCaptured.length > 0 && (
                             <button
                               type="button"
                               onClick={handleClearCaptured}
-                              className="text-[8px] text-red-400 hover:text-red-300 font-mono font-bold uppercase tracking-widest cursor-pointer bg-transparent border-none"
+                              className="text-[8px] text-[#8b1e1a] hover:text-red-500 font-bold uppercase tracking-widest cursor-pointer bg-transparent border-none"
                             >
                               Limpar Tudo
                             </button>
@@ -1159,57 +1166,59 @@ export default function App() {
                         </div>
 
                         {filteredCaptured.length === 0 ? (
-                          <p className="text-[10px] text-stone-500 font-mono text-center py-8">
-                            Nenhuma tentativa de login capturada para seus alvos ainda.
+                          <p className="text-[10px] text-stone-500 text-center py-10">
+                            Nenhuma credencial de login capturada para seus alvos até o momento.
                           </p>
                         ) : (
-                          <div className="space-y-1.5 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
+                          <div className="space-y-2 max-h-[220px] overflow-y-auto custom-scrollbar pr-1.5">
                             {filteredCaptured
                               .toReversed()
                               .map((entry, i) => (
-                              <div key={i} className="bg-[#1c1815] border border-[#3e352e] p-2.5 rounded-none">
-                                <div className="flex items-center justify-between">
-                                  <span className="text-[10px] text-[#cfab7c] font-mono font-bold">{entry.user}</span>
-                                  <span className="text-[8px] text-stone-500 font-mono">{entry.time}</span>
+                                <div key={i} className="bg-[#171311] border border-[#3e352e]/60 p-3 rounded-none flex items-center justify-between">
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-center justify-between gap-2">
+                                      <span className="text-[11px] text-[#cfab7c] font-bold">{entry.user}</span>
+                                      <span className="text-[8px] text-stone-500">{entry.time}</span>
+                                    </div>
+                                    <p className="text-[11px] text-[#ebdcc6] mt-1.5 break-all">
+                                      Senha: <strong className="text-red-500 font-bold bg-red-950/20 px-1 border border-[#8b1e1a]/20 select-all">{entry.pass}</strong>
+                                    </p>
+                                  </div>
                                 </div>
-                                <p className="text-[11px] text-[#ebdcc6] font-mono mt-1 break-all">
-                                  Senha Capturada: <strong className="text-red-400 font-black">{entry.pass}</strong>
-                                </p>
-                              </div>
-                            ))}
+                              ))}
                           </div>
                         )}
                       </div>
 
                       {/* Monitored User details display */}
-                      <div className="bg-[#1c1815] border border-[#3e352e] p-2.5 flex items-center justify-between text-[9px] font-mono">
+                      <div className="bg-[#171311] border border-[#3e352e]/60 p-3 flex items-center justify-between text-[9px]">
                         <span className="text-[#cfab7c]">Modo de Captura Ativo:</span>
-                        <span className="text-stone-400 uppercase">Apenas contas vinculadas ao seu Administrador</span>
+                        <span className="text-stone-400 uppercase">Apenas contas criadas pelo seu Admin</span>
                       </div>
                     </div>
                   )}
 
                   {activeAdminTab === "new_admin" && (
-                    <div className="bg-[#25201c] border border-[#3e352e] p-4 rounded-none animate-fade-in h-[320px]">
-                      <p className="text-[9px] text-[#cfab7c] font-bold uppercase tracking-widest font-mono mb-3">
+                    <div className="bg-[#0d0908] border border-[#3e352e]/70 p-5 rounded-none animate-fade-in h-[340px]">
+                      <p className="text-[9px] text-[#cfab7c] font-bold uppercase tracking-widest mb-3">
                         CADASTRAR OUTRO USUÁRIO ADMINISTRATIVO
                       </p>
 
                       {adminError && (
-                        <p className="text-[10px] text-red-400 font-mono bg-red-950/40 p-2 border border-red-900/30 mb-3">
-                          {adminError}
+                        <p className="text-[10px] text-red-400 bg-red-950/40 p-2.5 border border-red-900/30 mb-3">
+                          ⚠️ {adminError}
                         </p>
                       )}
 
                       {adminSuccess && (
-                        <p className="text-[10px] text-emerald-400 font-mono bg-emerald-950/40 p-2 border border-emerald-900/30 mb-3">
-                          {adminSuccess}
+                        <p className="text-[10px] text-emerald-400 bg-emerald-950/40 p-2.5 border border-emerald-900/30 mb-3">
+                          ✅ {adminSuccess}
                         </p>
                       )}
 
                       <form onSubmit={handleRegisterAdditionalAdmin} className="space-y-4">
                         <div>
-                          <label className="block text-[8px] text-stone-400 mb-1 font-bold uppercase tracking-widest font-mono">
+                          <label className="block text-[8px] text-stone-400 mb-1.5 font-bold uppercase tracking-widest">
                             Novo Usuário Admin
                           </label>
                           <input
@@ -1218,11 +1227,11 @@ export default function App() {
                             onChange={(e) => setAdminUser(e.target.value)}
                             placeholder="Ex: admin_secundario"
                             required
-                            className="w-full bg-[#1c1815] border border-[#3e352e] text-xs text-[#ebdcc6] px-3 py-2 rounded-none focus:outline-none focus:border-[#cfab7c] font-mono"
+                            className="w-full bg-[#171311] border border-[#cfab7c]/20 text-xs text-[#ebdcc6] px-3 py-2.5 rounded-none focus:outline-none focus:border-[#cfab7c]"
                           />
                         </div>
                         <div>
-                          <label className="block text-[8px] text-stone-400 mb-1 font-bold uppercase tracking-widest font-mono">
+                          <label className="block text-[8px] text-stone-400 mb-1.5 font-bold uppercase tracking-widest">
                             Senha de Acesso
                           </label>
                           <input
@@ -1231,13 +1240,13 @@ export default function App() {
                             onChange={(e) => setAdminPass(e.target.value)}
                             placeholder="••••••••"
                             required
-                            className="w-full bg-[#1c1815] border border-[#3e352e] text-xs text-[#ebdcc6] px-3 py-2 rounded-none focus:outline-none focus:border-[#cfab7c] font-mono"
+                            className="w-full bg-[#171311] border border-[#cfab7c]/20 text-xs text-[#ebdcc6] px-3 py-2.5 rounded-none focus:outline-none focus:border-[#cfab7c]"
                           />
                         </div>
 
                         <button
                           type="submit"
-                          className="w-full py-2 bg-[#cfab7c] hover:bg-[#b39063] text-[#1c1815] font-bold text-[10px] uppercase tracking-widest rounded-none font-mono cursor-pointer border-none"
+                          className="w-full py-2.5 bg-gradient-to-r from-[#cfab7c] to-[#ebdcc6] hover:from-[#ebdcc6] hover:to-[#cfab7c] text-[#0d0908] font-bold text-[10px] uppercase tracking-widest rounded-none cursor-pointer border-none shadow-md"
                         >
                           Registrar Novo Admin
                         </button>
@@ -1253,11 +1262,11 @@ export default function App() {
       )}
 
       {/* Global Page Footer */}
-      <footer className="w-full bg-[#1c1815] border-t border-[#2e2621] text-[#ebdcc6]/60 text-xs py-4 md:py-8 select-none font-serif">
-        <div className="max-w-6xl mx-auto px-3 md:px-6 text-center flex flex-col md:flex-row items-center justify-between gap-2 md:gap-4 text-[8px] md:text-[10px]">
+      <footer className="w-full bg-[#0d0908] border-t border-[#cfab7c]/15 text-[#ebdcc6]/60 text-xs py-6 md:py-10 select-none font-serif">
+        <div className="max-w-6xl mx-auto px-4 text-center flex flex-col md:flex-row items-center justify-between gap-4 text-[9px] md:text-[10px]">
           <p className="tracking-widest uppercase">© 2026 YING & CHEN BOUTIQUE. TODOS OS DIREITOS RESERVADOS.</p>
           <p className="font-mono text-[#cfab7c]/70 tracking-widest hidden xs:block">
-            ALTA COSTURA CHINESA • EXCLUSIVE CUSTOMER GATEWAY
+            ALTA COSTURA CHINESA • EXCLUSIVE MEMBER GATEWAY
           </p>
         </div>
       </footer>

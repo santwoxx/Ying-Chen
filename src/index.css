@@ -37,7 +37,7 @@
 @keyframes fade-in {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -48,11 +48,54 @@
 @keyframes scale-up {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: scale(0.95);
   }
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes border-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes ambient-glow {
+  0%, 100% {
+    opacity: 0.15;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.25;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes text-glow {
+  0%, 100% {
+    text-shadow: 0 0 4px rgba(207, 171, 124, 0.2);
+  }
+  50% {
+    text-shadow: 0 0 10px rgba(207, 171, 124, 0.6);
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
   }
 }
 
@@ -62,38 +105,87 @@
 }
 
 .animate-marquee {
-  animation: marquee 20s infinite linear;
+  animation: marquee 25s infinite linear;
 }
 
 .animate-fade-in {
-  animation: fade-in 0.4s ease-out forwards;
+  animation: fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-scale-up {
-  animation: scale-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: scale-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s infinite ease-in-out;
+}
+
+.animate-border-shimmer {
+  background-size: 200% 200%;
+  animation: border-shimmer 4s infinite linear;
+}
+
+.animate-ambient-glow {
+  animation: ambient-glow 8s infinite ease-in-out;
+}
+
+.animate-text-glow {
+  animation: text-glow 3s infinite ease-in-out;
 }
 
 /* Slim elegant scrollbar design for local database viewer */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
+  width: 6px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.4);
+  background: rgba(15, 23, 42, 0.3);
   border-radius: 999px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(239, 68, 68, 0.3);
+  background: rgba(207, 171, 124, 0.2);
   border-radius: 999px;
+  border: 1px solid rgba(28, 24, 21, 0.8);
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(239, 68, 68, 0.6);
+  background: rgba(207, 171, 124, 0.5);
 }
 
-/* background variations for premium look */
-.bg-slate-850 {
-  background-color: #151f32;
+/* Glassmorphism containers */
+.glass-container {
+  background: rgba(28, 24, 21, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(207, 171, 124, 0.15);
 }
 
-.bg-slate-955 {
-  background-color: #0b111e;
+.glass-container-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-container-hover:hover {
+  background: rgba(28, 24, 21, 0.85);
+  border-color: rgba(207, 171, 124, 0.4);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7), 0 0 15px -3px rgba(207, 171, 124, 0.1);
+}
+
+/* Premium Gold border gradient helper */
+.gold-gradient-border {
+  position: relative;
+  background: #1c1815;
+  background-clip: padding-box;
+  border: 1px solid transparent;
+}
+.gold-gradient-border::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  z-index: -1;
+  margin: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #cfab7c 0%, #ebdcc6 50%, #6b583f 100%);
+}
+
+/* Chinese lattice border overlay */
+.chinese-lattice-bg {
+  background-image: radial-gradient(rgba(207, 171, 124, 0.05) 1px, transparent 0);
+  background-size: 24px 24px;
 }
