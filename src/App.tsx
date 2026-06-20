@@ -6,6 +6,25 @@ import QrCodeToggler from "./components/QrCodeToggler";
 import RedPocketGift from "./components/RedPocketGift";
 
 // Import images for proper static building and hashing by Vite
+import serumSkincareGlow from "./assets/images/serum_skincare_glow.png";
+import conjuntoColarCoracao from "./assets/images/conjunto_colar_coracao.png";
+import tenisCasualFeminino from "./assets/images/tenis_casual_feminino.png";
+import batomMatteRouge from "./assets/images/batom_matte_rouge.png";
+import bolsaFemininaTiracolo from "./assets/images/bolsa_feminina_tiracolo.png";
+import perfumeFemininoAmore from "./assets/images/perfume_feminino_amore.png";
+
+// New product imports requested by USER
+import camisaBrasilAmarela from "./assets/images/camisa_brasil_amarela.png";
+import camisaBrasilPreta from "./assets/images/camisa_brasil_preta.png";
+import vestidoFloralBoho from "./assets/images/vestido_floral_boho.png";
+import vestidoMidiPlissado from "./assets/images/vestido_midi_plissado.png";
+import vestidoMidiValentine from "./assets/images/vestido_midi_valentine.png";
+import qipaoSilkDress from "./assets/images/qipao_silk_dress.png";
+import silkBlouseJardin from "./assets/images/silk_blouse_jardin.png";
+import linenEmbroideryCoat from "./assets/images/linen_embroidery_coat.png";
+import campaignHeaderImage from "./assets/images/chinese_clothing_campaign_1781968536386.jpg";
+
+// Lip gloss and lip care promotional images
 import macSquirtGloss from "./assets/images/mac_squirt_plumping_gloss.png";
 import diorLipGlowOil from "./assets/images/dior_lip_glow_oil.png";
 import fentyLipKit from "./assets/images/fenty_beauty_lip_kit.png";
@@ -50,8 +69,8 @@ export default function App() {
   const [currency, setCurrency] = useState("BRL");
   const [loginMethod, setLoginMethod] = useState<"password" | "qrcode">("password");
 
-  // Filter category state (Lip Products Categories)
-  const [activeCategory, setActiveCategory] = useState<"todos" | "gloss" | "lipoil" | "kits">("todos");
+  // Filter category state (SHEIN Categories)
+  const [activeCategory, setActiveCategory] = useState<"todos" | "motf" | "selecao" | "beleza">("todos");
 
   // Auth Inputs
   const [username, setUsername] = useState("");
@@ -459,8 +478,8 @@ export default function App() {
       howToTest: "Como funciona este teste local?",
       promptDesc: "O frontend se conecta de forma segura ao back-end que gerencia os usuários em users.json.",
       logoutBtn: "Encerrar Sessão",
-      productsTitle: "Vitrine VIP - Lip Shines & Lip Oils",
-      productsSub: "Glosses importados, lip oils de alta costura e kits exclusivos com 90% de desconto.",
+      productsTitle: "Vitrine VIP - Moda Premium & Super Ofertas",
+      productsSub: "Alta costura, roupas clássicas, maquiagens e os melhores lip glosses e lip oils com 90% de desconto.",
       buyNow: "ADICIONAR AO CARRINHO"
     },
     zh: {
@@ -482,8 +501,8 @@ export default function App() {
       howToTest: "此本地测试如何运作？",
       promptDesc: "前端与后端进行安全连接，并将用户 data and 输入的密码保存至本地 users.json 文件里。",
       logoutBtn: "退出登录",
-      productsTitle: "VIP 专属唇妆特惠专区",
-      productsSub: "奢华唇蜜、丰盈唇油以及经典护唇套装，尊享 1 折特惠。",
+      productsTitle: "VIP 专属特惠专区 - 高定服饰与美妆",
+      productsSub: "精选护肤精粹、经典美饰、巴西国家队球衣与高定礼服，特设奢华唇蜜与唇部护理专区，尊享 1 折特惠。",
       buyNow: "一键 Resgatar 优惠"
     },
     en: {
@@ -505,8 +524,8 @@ export default function App() {
       howToTest: "How does this local test work?",
       promptDesc: "The frontend connects securely to the backend which manages all credentials on users.json.",
       logoutBtn: "Sign Out",
-      productsTitle: "Exclusive Catalog - Lip Glosses & Lip Oils",
-      productsSub: "Premium imported lip shines, couture lip oils, and luxury lip kits at 90% OFF.",
+      productsTitle: "Exclusive VIP Catalog - Premium Fashion & Beauty",
+      productsSub: "High-end couture, designer dresses, official jerseys, and premium lip shines & lip oils at 90% OFF.",
       buyNow: "Secure VIP Deal"
     }
   }[language];
@@ -515,7 +534,7 @@ export default function App() {
   const getProduct = (
     id: string,
     badge: string,
-    category: "gloss" | "lipoil" | "kits",
+    category: "todos" | "motf" | "selecao" | "beleza",
     image: any,
     origBRL: number,
     names: { pt: string; en: string; zh: string },
@@ -552,68 +571,216 @@ export default function App() {
     };
   };
 
+  // Specific Products requested by the USER (Including both original fashion/deals and the new cosmetics promo items)
   const clothingProducts = [
-    getProduct("prod-squirt-gloss", "M·A·C", "gloss", macSquirtGloss, 208, 
+    // 1. Original Products
+    {
+      id: "prod-sheglam-blush",
+      name: language === "zh" ? "SHEGLAM Color Bloom 液体腮红 - 哑光雾面" : language === "en" ? "SHEGLAM Color Bloom Liquid Blush Matte" : "SHEGLAM Color Bloom Liquid Blush Matte - Rose Ritual",
+      desc: language === "zh" ? "长效锁色持妆，不脱色高显色，凝胶面霜质地，轻薄服帖，送礼最佳选择。" : language === "en" ? "Gel-cream blush, highly pigmented, lightweight formula that stays all day." : "Blush líquido gel creme de longa duração, altamente pigmentado e leve. Acabamento matte aveludado.",
+      image: batomMatteRouge,
+      originalPrice: currency === "BRL" ? 59.90 : currency === "CNY" ? 89.00 : 12.00,
+      promoPrice: currency === "BRL" ? 23.21 : currency === "CNY" ? 29.00 : 4.50,
+      stockPercent: 95,
+      itemsLeft: 3,
+      badge: "Oferta Relâmpago",
+      category: "beleza"
+    },
+    {
+      id: "prod-seamless-jacket",
+      name: language === "zh" ? "女子专业无缝拉链防风运动跑步夹克" : language === "en" ? "Women's Professional Seamless Zipper Sport Jacket" : "Jaqueta Profissional Sem Costura com Zíper para Mulheres",
+      desc: language === "zh" ? "高弹透气无缝，修身剪裁设计，适合跑步、健身房训练及瑜伽，春季防风推荐。" : language === "en" ? "Form-fitting running jacket, high elastic breathable weave, front full zipper." : "Roupa esportiva ajustada para corrida, academia e yoga. Cor preta, ideal para treinos.",
+      image: campaignHeaderImage,
+      originalPrice: currency === "BRL" ? 180.00 : currency === "CNY" ? 240.00 : 36.00,
+      promoPrice: currency === "BRL" ? 93.11 : currency === "CNY" ? 115.00 : 18.00,
+      stockPercent: 92,
+      itemsLeft: 4,
+      badge: "Super Ofertas",
+      category: "beleza"
+    },
+    {
+      id: "prod-soquete-socks",
+      name: language === "zh" ? "Kit 3/6/12双中性短筒透气船袜短袜" : language === "en" ? "Kit 3/6/12 Pairs Unisex Short Low Cut Socks" : "Kit 3/6/12 Pares Meias Soquete Cano Curto Unissex",
+      desc: language === "zh" ? "精选柔软精梳棉，网眼排汗舒适不滑落，短筒浅口，男女适用尺码35-40。" : language === "en" ? "Breathable cotton blend ankle socks, non-slip design, unisex size range 35-40." : "Meias curtas unissex multicoloridas tamanho 35-40. Super confortáveis e respiráveis.",
+      image: conjuntoColarCoracao,
+      originalPrice: currency === "BRL" ? 25.00 : currency === "CNY" ? 35.00 : 5.00,
+      promoPrice: currency === "BRL" ? 9.47 : currency === "CNY" ? 12.00 : 2.00,
+      stockPercent: 88,
+      itemsLeft: 6,
+      badge: "37% OFF",
+      category: "beleza"
+    },
+    {
+      id: "prod-leather-jacket",
+      name: language === "zh" ? "MOTF 极简翻领长袖宽松仿皮夹克外套" : language === "en" ? "MOTF Loose Minimalist PU Leather Lapel Jacket" : "Jaqueta Solta de Couro PU Minimalista de Manga Longa - MOTF",
+      desc: language === "zh" ? "复古翻领修饰，时尚落肩宽松剪裁，金属质感拉链，高品质防风抗皱面料。" : language === "en" ? "Minimalist lapel design with front zipper, vintage distressed PU finish." : "Jaqueta de couro sintético desgastada estilo retrô feminina com zíper e lapela. Cor vermelha vintage.",
+      image: linenEmbroideryCoat,
+      originalPrice: currency === "BRL" ? 349.00 : currency === "CNY" ? 420.00 : 69.00,
+      promoPrice: currency === "BRL" ? 176.90 : currency === "CNY" ? 220.00 : 35.00,
+      stockPercent: 96,
+      itemsLeft: 2,
+      badge: "84% OFF",
+      category: "motf"
+    },
+    {
+      id: "prod-flora-isola-set",
+      name: language === "zh" ? "Flora Isola 优雅吊带背心与直筒长裤两件套" : language === "en" ? "Flora Isola Elegant Camisole & Pants Two-Piece Set" : "Flora Isola Conjunto de Regata e Calça Elegantes - MOTF",
+      desc: language === "zh" ? "高级通勤剪裁，垂坠感极佳，打造利落职场女性形象，适合办公室商务搭配。" : language === "en" ? "Business casual two-piece co-ord, elegant fit for office, teacher outfit." : "Conjunto regata e calça de caimento elegante para mulheres, estilo negócios e escritório.",
+      image: silkBlouseJardin,
+      originalPrice: currency === "BRL" ? 220.00 : currency === "CNY" ? 280.00 : 45.00,
+      promoPrice: currency === "BRL" ? 100.49 : currency === "CNY" ? 125.00 : 20.00,
+      stockPercent: 89,
+      itemsLeft: 3,
+      badge: "#Casaco Pelinho",
+      category: "motf"
+    },
+    {
+      id: "prod-siren-gaze-set",
+      name: language === "zh" ? "Siren Gaze 撞色修身马甲与垂感直筒裤套装" : language === "en" ? "Siren Gaze Contrast Trim Vest & Trousers Set" : "Siren Gaze Conjunto de Colete e Calça Contrastante - MOTF",
+      desc: language === "zh" ? "法式优雅老钱风设计，精致撞色织带收边，面料垂顺防皱，秋季 daily 高级穿搭。" : language === "en" ? "Old money vest suit with contrast details, ideal for wedding guest or workwear." : "Colete e calça com recorte contrastante elegante, estilo Old Money, casual executivo.",
+      image: vestidoMidiPlissado,
+      originalPrice: currency === "BRL" ? 399.00 : currency === "CNY" ? 490.00 : 80.00,
+      promoPrice: currency === "BRL" ? 175.99 : currency === "CNY" ? 220.00 : 35.00,
+      stockPercent: 93,
+      itemsLeft: 2,
+      badge: "#Roupa de trabalho",
+      category: "motf"
+    },
+    {
+      id: "prod-brasil-jersey-yellow",
+      name: language === "zh" ? "巴西国家队经典黄色球员版球衣" : language === "en" ? "Brazil National Team Home Jersey - Yellow" : "Camisa da Seleção Brasileira - Canarinho Amarela",
+      desc: language === "zh" ? "五星巴西经典黄，速干排汗透气面料，官方裁线剪裁，球迷运动必备首选。" : language === "en" ? "Classic yellow home kit, dry-fit breathable fabric, premium athletic fit." : "A clássica amarelinha de cinco estrelas, tecido respirável dry-fit, ajuste esportivo e escudo bordado.",
+      image: camisaBrasilAmarela,
+      originalPrice: currency === "BRL" ? 349.90 : currency === "CNY" ? 420.00 : 65.00,
+      promoPrice: currency === "BRL" ? 69.90 : currency === "CNY" ? 85.00 : 12.90,
+      stockPercent: 98,
+      itemsLeft: 2,
+      badge: "Edição Oficial",
+      category: "selecao"
+    },
+    {
+      id: "prod-brasil-jersey-black",
+      name: language === "zh" ? "巴西国家队特别纪念版黑色球衣" : language === "en" ? "Brazil National Team Special Edition Jersey - Black" : "Camisa da Seleção Brasileira - Edição Especial Preta",
+      desc: language === "zh" ? "特别纪念款黑色面料，金色纹路修饰，尊贵典雅，透气舒适排汗。" : language === "en" ? "Special edition black kit with gold detail trims, sleek modern design." : "Modelo exclusivo em cor preta com detalhes dourados minimalistas, tecido premium respirável.",
+      image: camisaBrasilPreta,
+      originalPrice: currency === "BRL" ? 349.90 : currency === "CNY" ? 420.00 : 65.00,
+      promoPrice: currency === "BRL" ? 69.90 : currency === "CNY" ? 85.00 : 12.90,
+      stockPercent: 95,
+      itemsLeft: 3,
+      badge: "Edição Limitada",
+      category: "selecao"
+    },
+    {
+      id: "prod-vestido-valentine",
+      name: language === "zh" ? "情人节臻选红色玫瑰吊带丝绒裙" : language === "en" ? "Valentine Rose Crimson Velvet Midi Dress" : "Vestido Midi Valentine Velvet - Vermelho Carmim",
+      desc: language === "zh" ? "奢华丝绒面料，深V性感剪裁，亮面正红色，情人节约会完美推荐。" : language === "en" ? "Luxurious dark velvet texture with deep-V cut, elegant ruby red tone." : "Acabamento em veludo de toque macio com decote sofisticado, tom vermelho carmim profundo.",
+      image: vestidoMidiValentine,
+      originalPrice: currency === "BRL" ? 429.90 : currency === "CNY" ? 520.00 : 80.00,
+      promoPrice: currency === "BRL" ? 85.90 : currency === "CNY" ? 105.00 : 16.00,
+      stockPercent: 94,
+      itemsLeft: 2,
+      badge: "Exclusivo",
+      category: "motf"
+    },
+    {
+      id: "prod-qipao-dress",
+      name: language === "zh" ? "国风改良丝绸旗袍礼服连衣裙" : language === "en" ? "Modern Qipao Silk Floral Evening Dress" : "Vestido Qipao Oriental em Seda - Alta Costura",
+      desc: language === "zh" ? "优质天然桑蚕丝，改良侧开叉修身剪裁，精致盘扣与古典花卉印花。" : language === "en" ? "Natural mulberry silk, modernized bodycon cut, traditional buttons and pattern." : "Seda natural amoreira de alto padrão, fenda lateral elegante e abotoamento tradicional.",
+      image: qipaoSilkDress,
+      originalPrice: currency === "BRL" ? 599.90 : currency === "CNY" ? 720.00 : 110.00,
+      promoPrice: currency === "BRL" ? 119.90 : currency === "CNY" ? 145.00 : 22.00,
+      stockPercent: 96,
+      itemsLeft: 1,
+      badge: "Peça Única",
+      category: "motf"
+    },
+    {
+      id: "prod-skincare-serum",
+      name: language === "zh" ? "玻尿酸补水修护面部精华液" : language === "en" ? "Glow Skincare Hyaluronic Acid Serum" : "Sérum Facial Hidratante Ácido Hialurônico Glow",
+      desc: language === "zh" ? "深层补水，紧致修护，打造韩式水光肌，温和无刺激。" : language === "en" ? "Deep hydration and barrier repair for a radiant, glowing complexion." : "Hidratação profunda, preenchimento de linhas finas e efeito pele iluminada (Glow) natural.",
+      image: serumSkincareGlow,
+      originalPrice: currency === "BRL" ? 89.90 : currency === "CNY" ? 110.00 : 16.00,
+      promoPrice: currency === "BRL" ? 19.90 : currency === "CNY" ? 25.00 : 4.00,
+      stockPercent: 94,
+      itemsLeft: 5,
+      badge: "Queridinho",
+      category: "beleza"
+    },
+    {
+      id: "prod-perfume-flora",
+      name: language === "zh" ? "巴黎恋人淡香精 50ml - 花果香调" : language === "en" ? "Amore Eau de Parfum for Women 50ml" : "Perfume Feminino Amore Eau de Parfum 50ml",
+      desc: language === "zh" ? "经典甜美花果香调，前调茉莉中调香草，温婉迷人。" : language === "en" ? "Delicate floral-fruity scent with jasmine and warm vanilla undertones, designed for daily wear." : "Fragrância floral frutada marcante com notas de jasmin e baunilha, ideal para o dia a dia.",
+      image: perfumeFemininoAmore,
+      originalPrice: currency === "BRL" ? 289.90 : currency === "CNY" ? 360.00 : 55.00,
+      promoPrice: currency === "BRL" ? 59.90 : currency === "CNY" ? 75.00 : 12.00,
+      stockPercent: 93,
+      itemsLeft: 2,
+      badge: "Destaque",
+      category: "beleza"
+    },
+
+    // 2. New Promotional Lip Glosses, Lip Oils and Lip Kits (added under "beleza" category)
+    getProduct("prod-squirt-gloss", "M·A·C", "beleza", macSquirtGloss, 208, 
       { pt: "GLOSS MAC SQUIRT PLUMPING SHIMMER", en: "MAC Squirt Plumping Shimmer Gloss", zh: "魅可 SQUIRT 丰盈闪耀唇蜜" },
       { pt: "Brilho labial Squirt Plumping Gloss em tom translúcido de alta cintilância, efeito volumoso imediato e refrescante.", en: "Squirt Plumping Gloss in translucent shimmer shades, instant cooling and plumping effect for juicy lips.", zh: "SQUIRT 丰唇蜜，清凉感十足，瞬间饱满丰唇效果。" }
     ),
-    getProduct("prod-jelly-oil-bt", "BRUNA TAVARES", "lipoil", jellyOilBT, 70,
+    getProduct("prod-jelly-oil-bt", "BRUNA TAVARES", "beleza", jellyOilBT, 70,
       { pt: "GLOSS LABIAL JELLY OIL BRUNA TAVARES BANANA", en: "Bruna Tavares Jelly Lip Oil Banana", zh: "Bruna Tavares 香蕉凝胶唇油" },
       { pt: "Óleo labial com textura jelly super confortável, enriquecido com ativos hidratantes e aroma suave de banana.", en: "Lip oil with a super comfortable jelly texture, enriched with moisturizing ingredients and a sweet banana scent.", zh: "舒适凝胶质地唇油，富含滋润成分，淡淡香蕉甜香。" }
     ),
-    getProduct("prod-lipglass-air-mini", "M·A·C", "gloss", macSquirtGloss, 102,
+    getProduct("prod-lipglass-air-mini", "M·A·C", "beleza", macSquirtGloss, 102,
       { pt: "MINI GLOSS MAC LIPGLASS AIR (4 opções)", en: "Mini MAC Lipglass Air Gloss (4 shades)", zh: "迷你魅可 Lipglass Air 唇蜜（4色可选）" },
       { pt: "Versão mini do icônico Lipglass com acabamento de alto brilho e efeito espelhado impecável.", en: "Mini edition of the iconic Lipglass featuring high-gloss, crystal-like mirror finish.", zh: "经典 Lipglass 迷你装，高光镜面般无瑕闪耀。" }
     ),
-    getProduct("prod-laneige-lip-trio", "LANEIGE", "kits", fentyLipKit, 269,
+    getProduct("prod-laneige-lip-trio", "LANEIGE", "beleza", fentyLipKit, 269,
       { pt: "Kit Cuidado Labial Laneige Lip Trio Set Berry Sweet", en: "Laneige Lip Trio Set Berry Sweet Lip Care", zh: "兰芝 Berry Sweet 唇部护理三件套" },
       { pt: "O trio perfeito de cuidado labial da Laneige com máscaras de tratamento noturno no aroma Berry Sweet.", en: "The perfect lip care trio by Laneige featuring intense overnight sleeping masks in Berry Sweet.", zh: "兰芝完美唇部护理三件套，蕴含莓果甜香 of 夜间修护唇膜。" }
     ),
-    getProduct("prod-givenchy-perfecto", "GIVENCHY", "lipoil", diorLipGlowOil, 280,
+    getProduct("prod-givenchy-perfecto", "GIVENCHY", "beleza", diorLipGlowOil, 280,
       { pt: "LIP OIL GIVENCHY PERFECTO (4 opções)", en: "Givenchy Rose Perfecto Lip Oil (4 shades)", zh: "纪梵希 Rose Perfecto 护唇油（4色可选）" },
       { pt: "Tratamento luxuoso em óleo que nutre profundamente os lábios enquanto realça a cor natural.", en: "Luxurious oil treatment that deeply nourishes lips while enhancing their natural rosy glow.", zh: "奢华唇部 oil 修护，深层滋养唇肌，彰显自然粉嫩。" }
     ),
-    getProduct("prod-dior-addict-glow", "DIOR", "lipoil", diorLipGlowOil, 313,
+    getProduct("prod-dior-addict-glow", "DIOR", "beleza", diorLipGlowOil, 313,
       { pt: "GLOSS LABIAL DIOR ADDICT LIP GLOW OIL (9 opções)", en: "Dior Addict Lip Glow Oil (9 shades)", zh: "迪奥 Addict Lip Glow 护唇油（9色可选）" },
       { pt: "O aclamado óleo labial da Dior que protege, embeleza e reativa a cor natural dos lábios.", en: "The highly acclaimed Dior lip oil that protects, beautifies, and intensely revives natural lip color.", zh: "备受推崇的迪奥护唇油，保护并焕发双唇自然色彩。" }
     ),
-    getProduct("prod-boca-rosa-choco", "BOCA ROSA", "kits", fentyLipKit, 160,
+    getProduct("prod-boca-rosa-choco", "BOCA ROSA", "beleza", fentyLipKit, 160,
       { pt: "KIT LABIAL BOCA ROSA HIDRA CHOCO", en: "Boca Rosa Hidra Choco Lip Kit", zh: "Boca Rosa Hidra Choco 唇部套装" },
-      { pt: "Kit labial Boca Rosa com contorno e gloss hidratante no delicioso tom chocolate e textura confortável.", en: "Boca Rosa lip kit featuring lip liner and moisturizing gloss in a delicious chocolate shade.", zh: "Boca Rosa 唇部套装，包含唇线笔与巧克力色滋润唇蜜。" }
+      { pt: "Kit labial Boca Rosa com contorno e gloss hidratante no delicioso tom chocolate e textura confortável.", en: "Boca Rosa lip kit featuring lip liner and moisturizing gloss in a delicious chocolate shade.", zh: "Boca Rosa 唇部套装，包含唇线笔 ou 巧克力色滋润唇蜜。" }
     ),
-    getProduct("prod-bt-glaze", "BRUNA TAVARES", "gloss", jellyOilBT, 70,
+    getProduct("prod-bt-glaze", "BRUNA TAVARES", "beleza", jellyOilBT, 70,
       { pt: "GLOSS LABIAL BRUNA TAVARES BT GLAZE (8 opções)", en: "Bruna Tavares BT Glaze Lip Gloss (8 shades)", zh: "Bruna Tavares BT Glaze 唇蜜（8色可选）" },
       { pt: "Fórmula inovadora de alta pigmentação com efeito laqueado 3D, super macio e confortável.", en: "Innovative highly pigmented formula with 3D vinyl lacquer effect, ultra-comfortable wear.", zh: "高显色创意配方，3D 漆光亮泽，质地极其温和。" }
     ),
-    getProduct("prod-kylie-supple-kiss", "KYLIE COSMETICS", "gloss", macSquirtGloss, 172,
+    getProduct("prod-kylie-supple-kiss", "KYLIE COSMETICS", "beleza", macSquirtGloss, 172,
       { pt: "BRILHO LABIAL KYLIE COSMETICS KING KYLIE SUPPLE KISS (3 opções)", en: "Kylie Cosmetics King Kylie Supple Kiss Lip Glaze (3 shades)", zh: "Kylie Cosmetics King Kylie 柔嫩之吻唇釉（3色可选）" },
       { pt: "Brilho labial de textura levíssima que proporciona brilho molhado e hidratação intensa sem colar.", en: "Ultra-lightweight lip glaze that delivers high wet-shine look and non-sticky deep hydration.", zh: "超轻盈质地唇釉，带来湿润光泽，滋润不黏腻。" }
     ),
-    getProduct("prod-fenty-ramadan-link", "FENTY BEAUTY", "kits", fentyLipKit, 248,
+    getProduct("prod-fenty-ramadan-link", "FENTY BEAUTY", "beleza", fentyLipKit, 248,
       { pt: "KIT LABIAL FENTY BEAUTY RAMADAN LINK UP", en: "Fenty Beauty Ramadan Link Up Lip Kit", zh: "Fenty Beauty 斋月联名唇部套装" },
       { pt: "Kit exclusivo Ramadan contendo o mini gloss best-seller e lápis labial de contorno em tamanho especial.", en: "Exclusive Ramadan set featuring the best-selling mini gloss bomb and a matching lip liner pencil.", zh: "斋月限量版套装，包含畅销迷你唇蜜和唇线笔。" }
     ),
-    getProduct("prod-fenty-lip-drip", "FENTY BEAUTY", "kits", fentyLipKit, 205,
+    getProduct("prod-fenty-lip-drip", "FENTY BEAUTY", "beleza", fentyLipKit, 205,
       { pt: "KIT FENTY BEAUTY LIP DRIP DUO", en: "Fenty Beauty Lip Drip Duo Set", zh: "Fenty Beauty 双色唇蜜套装" },
       { pt: "Duo de glosses icônicos Fenty Glow para lábios instantaneamente mais volumosos e ultra-brilhantes.", en: "Iconic Fenty Glow gloss duo for instantly fuller-looking and ultra-shiny glass lips.", zh: "经典 double-gloss 套装，打造饱满镜光双唇。" }
     ),
-    getProduct("prod-fenty-ramadan-iconic", "FENTY BEAUTY", "kits", fentyLipKit, 421,
+    getProduct("prod-fenty-ramadan-iconic", "FENTY BEAUTY", "beleza", fentyLipKit, 421,
       { pt: "KIT FENTY BEAUTY RAMADAN ICONIC LIP TRIO", en: "Fenty Beauty Ramadan Iconic Lip Trio", zh: "Fenty Beauty 斋月明星唇部三件套" },
-      { pt: "Edição de luxo com trio de lábios Fenty contendo Gloss Bomb e batom de acabamento refinado.", en: "Luxury edition lip trio by Fenty featuring full-sized Gloss Bomb and high-pigment cream lipstick.", zh: "奢华三件套，包含正装 Gloss Bomb 和哑光唇膏。" }
+      { pt: "Edição de luxo com trio de lábios Fenty contendo Gloss Bomb e batom de acabamento refinado.", en: "Luxury edition lip trio by Fenty featuring full-sized Gloss Bomb and high-pigment cream lipstick.", zh: "奢华三件套，包含正装 Gloss Bomb 和%E5%A5%87%E7%89%B9%E5%94%87%E8%8A%8F。" }
     ),
-    getProduct("prod-mac-lipglass-pencil", "M·A·C", "kits", macSquirtGloss, 341,
+    getProduct("prod-mac-lipglass-pencil", "M·A·C", "beleza", macSquirtGloss, 341,
       { pt: "KIT LIP MOMENT MAC LIPGLASS AIRSHINE E LIP PENCIL", en: "MAC Lip Moment Lipglass Airshine & Lip Pencil Set", zh: "魅可 Lip Moment 镜光唇蜜与唇线笔套装" },
       { pt: "Combinação perfeita de delineador e gloss espelhado para lábios definidos e ultra-luminosos.", en: "Perfect combo of high-precision lip liner and mirror-shine gloss for defined, luminous lips.", zh: "唇线笔与高亮唇蜜 the 完美搭配，勾勒闪耀饱满唇妆。" }
     ),
-    getProduct("prod-mac-maxcimal-airshine", "M·A·C", "kits", macSquirtGloss, 341,
+    getProduct("prod-mac-maxcimal-airshine", "M·A·C", "beleza", macSquirtGloss, 341,
       { pt: "KIT LIP MOMENT MAC MAXCIMAL E LIPGLASS AIRSHINE", en: "MAC Lip Moment Macximal & Lipglass Airshine Set", zh: "魅可 Lip Moment 哑光唇膏与镜光唇蜜套装" },
       { pt: "Kit de luxo contendo batom matte de alta fixação e finalizador de brilho espelhado Lipglass.", en: "Luxury set containing high-fixation matte lipstick and the mirror-shine Lipglass topper.", zh: "高持久哑光唇膏与 Lipglass 镜面唇蜜的奢华礼盒。" }
     ),
-    getProduct("prod-mari-maria-candy", "MARI MARIA", "gloss", jellyOilBT, 76,
+    getProduct("prod-mari-maria-candy", "MARI MARIA", "beleza", jellyOilBT, 76,
       { pt: "GLOSS MARI MARIA LIP CANDY (3 opções)", en: "Mari Maria Lip Candy Gloss (3 shades)", zh: "Mari Maria 糖果唇蜜（3色可选）" },
-      { pt: "Fórmula confortável e leve com partículas de brilho multidimensionais e aroma adocicado.", en: "Lightweight formula featuring multidimensional shimmer particles and sweet scent.", zh: "轻盈质地，富含多维闪耀颗粒与甜美香气。" }
+      { pt: "Fórmula confortável e leve com partículas de brilho multidimensionais e aroma adocicado.", en: "Lightweight formula featuring multidimensional shimmer particles and sweet scent.", zh: "轻盈质地，富含多维闪耀颗粒 com aroma adocicado." }
     ),
-    getProduct("prod-ch-good-girl-oil", "CAROLINA HERRERA", "lipoil", diorLipGlowOil, 297,
+    getProduct("prod-ch-good-girl-oil", "CAROLINA HERRERA", "beleza", diorLipGlowOil, 297,
       { pt: "LIP OIL CAROLINA HERRERA GOOD GIRL", en: "Carolina Herrera Good Girl Lip Oil", zh: "卡罗琳娜·海莱拉 Good Girl 护唇油" },
       { pt: "Óleo labial de alta costura com hidratação nutritiva e brilho sofisticado inspirado no icônico Good Girl.", en: "High-fashion lip oil providing deep nourishment and sophisticated shine inspired by Good Girl.", zh: "高定美妆系列护唇油，深层滋润，绽放高贵优雅。" }
     ),
@@ -662,9 +829,9 @@ export default function App() {
             <div className="flex flex-wrap gap-2 py-4">
               {[
                 { id: "todos", label: language === "zh" ? "全部商品" : language === "en" ? "All Products" : "Ver Tudo", icon: ShoppingBag },
-                { id: "gloss", label: language === "zh" ? "奢华唇蜜" : language === "en" ? "Glosses" : "Glosses", icon: Layers },
-                { id: "lipoil", label: language === "zh" ? "滋养唇油" : language === "en" ? "Lip Oils" : "Lip Oils", icon: Sparkles },
-                { id: "kits", label: language === "zh" ? "超值套装" : language === "en" ? "Kits & Combos" : "Kits & Combos", icon: Award }
+                { id: "motf", label: "MOTF Premium", icon: Layers },
+                { id: "selecao", label: language === "zh" ? "国家队球衣" : language === "en" ? "Brazil Kits" : "Camisas Seleção", icon: Award },
+                { id: "beleza", label: language === "zh" ? "美妆护肤" : language === "en" ? "Beauty & Deals" : "Beleza e Saúde", icon: Sparkles }
               ].map((cat) => {
                 const Icon = cat.icon;
                 const isActive = activeCategory === cat.id;
