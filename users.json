@@ -1,0 +1,32 @@
+[
+  {
+    "username": "@admin",
+    "password": "admin123",
+    "role": "Administrador",
+    "name": "Sr. Chen (Admin)"
+  },
+  {
+    "username": "@comprador",
+    "password": "123",
+    "role": "Comprador Master",
+    "name": "Ana Silva"
+  },
+  {
+    "username": "@vip_client",
+    "password": "666",
+    "role": "Cliente VIP Gold",
+    "name": "Wang Wei"
+  },
+  {
+    "username": "@natanmarinho.dev",
+    "password": "adaff",
+    "role": "VIP Developer",
+    "name": "Natan Marinho"
+  },
+  {
+    "username": "@test_user",
+    "password": "qwe",
+    "role": "Testador de Sistemas",
+    "name": "Guto Developer"
+  }
+]

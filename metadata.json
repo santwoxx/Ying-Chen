@@ -1,0 +1,6 @@
+{
+  "name": "Login de Loja Chinesa",
+  "description": "Tela de login altamente polida temática de e-commerce chinês, com persistência de banco de dados JSON no servidor, ideal para testes locais.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
